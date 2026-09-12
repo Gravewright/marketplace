@@ -3,7 +3,7 @@
     "id": "gravewright.translator",
     "name": "Translator",
     "version": "0.1.0",
-    "description": "Installation-wide English, Brazilian Portuguese and Spanish language options.",
+    "description": "Extensible translation engine for Gravewright VTT. Centralizes interface translations in language catalogs and lets each user choose their language in account settings.",
     "sdk": ">=1.0.0 <2.0.0",
     "type": "module",
     "tags": [
@@ -14,6 +14,6 @@
     "download": "https://github.com/Gravewright/translator/releases/download/v0.1.0/translator-0.1.0.zip",
     "sha256": "bd2f829639b5a75557b373cef48c408ebeb5e4565b6df03372eb27a7943caa29",
     "keyId": "gravewright-2026",
-    "signature": "kMRCL/9lAPqCxF6nf57nrTMuGzTzjTiEdHTfiPmLTvXL0RFHkIV8manwUBZgEG3lQj8I+J6g6cuSDe3Q3/92DQ=="
+    "signature": "5qg2Dr2bGbhmx6N3i+D4Ux+sIae6oO7tpzOw+/U2WwEjUZbheVWp0vIrqqzAgWVbB7ZPyj7fyHrVT7QL8Wo8Aw=="
   }
 ]
