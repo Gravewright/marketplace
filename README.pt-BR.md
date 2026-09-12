@@ -20,3 +20,9 @@ Instale [Translator v0.1.0](https://github.com/Gravewright/translator/releases/t
 Esta pré-release exige as alterações do host que suportam `manifest.locales` e a ativação global. Hosts anteriores não são compatíveis. A cobertura e os limites estão documentados no [repositório Translator](https://github.com/Gravewright/translator).
 
 Validação local: `python scripts/validate_catalog.py` em um ambiente com `cryptography`.
+
+## Categorias definidas pelo criador
+
+O registro pode incluir `"type": "module"` (ou `"system"`) e `"tags": ["Tradução", "Idiomas", "Interface"]`. A modal do VTT gera suas categorias a partir dessas tags, separadamente para sistemas e módulos. São aceitas até 24 tags únicas, não vazias, de até 64 caracteres, incluindo acentos.
+
+As tags fazem parte da assinatura. Alterá-las exige assinar novamente o registro; o ZIP e seu SHA-256 podem permanecer iguais se o pacote não mudou. Este formato exige o suporte a tags do host atualizado.

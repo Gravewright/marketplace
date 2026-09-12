@@ -34,3 +34,13 @@ python scripts/validate_catalog.py
 ```
 
 [Português](README.pt-BR.md)
+
+## Creator-defined categories
+
+Add `"type": "module"` (or `"system"`) and a free-text `tags` list to a signed record, for example:
+
+```json
+"tags": ["Tradução", "Idiomas", "Interface"]
+```
+
+The VTT builds the installation modal's categories from these tags, separately for systems and modules. Tags are displayed as supplied by the creator. Up to 24 unique, nonempty tags of 64 characters are accepted, including Unicode. Tags must be included before signing: changing them invalidates the previous signature. Catalog metadata can be re-signed without replacing an unchanged release ZIP or its SHA-256. Older hosts without tag support require the current host integration.
