@@ -1,5 +1,13 @@
-{
-  "schema_version": 1,
-  "packages": [],
-  "revoked": []
-}
+[
+  {
+    "id": "gravewright.translator",
+    "name": "Translator",
+    "version": "0.1.0",
+    "description": "Installation-wide English, Brazilian Portuguese and Spanish language options.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "download": "https://github.com/Gravewright/translator/releases/download/v0.1.0/translator-0.1.0.zip",
+    "sha256": "bd2f829639b5a75557b373cef48c408ebeb5e4565b6df03372eb27a7943caa29",
+    "keyId": "gravewright-2026",
+    "signature": "YCvUCTOABAT00gpDvcVum8k74sO1XTTbcAyGx7pBxXxFxG6J1JpTujUyWzJvoDFa+BHZaJqDGwnt8Ngr8ifBDw=="
+  }
+]
