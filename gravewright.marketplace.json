@@ -15,5 +15,22 @@
     "sha256": "bd2f829639b5a75557b373cef48c408ebeb5e4565b6df03372eb27a7943caa29",
     "keyId": "gravewright-2026",
     "signature": "5qg2Dr2bGbhmx6N3i+D4Ux+sIae6oO7tpzOw+/U2WwEjUZbheVWp0vIrqqzAgWVbB7ZPyj7fyHrVT7QL8Wo8Aw=="
+  },
+  {
+    "id": "gravewright-3d-dice",
+    "name": "Gravewright 3D Dice",
+    "version": "0.1.0",
+    "description": "Physical 3D dice for Gravewright rolls, with private-roll visibility and personal dice colors, text colors and fonts.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "module",
+    "tags": [
+      "Dados",
+      "3D",
+      "Rolagens"
+    ],
+    "download": "https://github.com/Gravewright/Gravewright-3D-Dice/releases/download/v0.1.0/gravewright-3d-dice-0.1.0.zip",
+    "sha256": "a3528fd5538cfc55cac837a4e2db3369ecd4e9e07a7f0a4f3cea69671223c23d",
+    "keyId": "gravewright-2026",
+    "signature": "Jf0zz4V32PRnW4aoEAJxhVfyHlKCswGAN5+t4joQmrIszEKPVKiBvGXPNBmGQreEQQb2Ca29GBcg2LGRKL7fBg=="
   }
 ]
