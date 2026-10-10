@@ -1,6 +1,11 @@
 # Marketplace do Gravewright
 
-Catálogo assinado de módulos e sistemas, com arquivos ZIP publicados nas releases dos respectivos repositórios.
+A assinatura e a publicação dos pacotes agora são feitas pelo workflow
+**Sign and publish package**, com aprovação no ambiente `release-signing`.
+Consulte [publicação, responsáveis e recuperação de chaves](PUBLISHING.pt-BR.md).
+
+Catálogo assinado de módulos e sistemas. Novos ZIPs são publicados nas Releases
+do Marketplace; os endereços das versões anteriores são preservados.
 
 Configure no ambiente do VTT:
 

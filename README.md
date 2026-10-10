@@ -1,5 +1,10 @@
 # Gravewright Marketplace
 
+Package signing and publishing now run in this repository's **Sign and publish
+package** GitHub Actions workflow, behind the `release-signing` environment's
+required approval. New release assets are hosted here; existing package URLs stay
+unchanged. See [publication, maintainers and key recovery](PUBLISHING.pt-BR.md).
+
 Signed module and system catalog consumed by Gravewright VTT. Packages are real GitHub release assets; installed packages are listed from the host database.
 
 ## Host configuration
