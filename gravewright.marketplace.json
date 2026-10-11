@@ -49,5 +49,22 @@
     "sha256": "9d71ef4f175943adccebfaff7354d0896659d9db6e153ec19c31f26775bda8e0",
     "keyId": "gravewright-2026-10",
     "signature": "XS/Qb8hTHSIBKkXE6uPBzW+52hRItCn4GSXohrFpd4Adi7D+Pks91OpRiVtIIQqZRhF2hUXG+Nyp1veqOGpMDg=="
+  },
+  {
+    "id": "gravewright.translator",
+    "name": "Translator",
+    "version": "0.1.1",
+    "description": "Extensible translation engine for Gravewright VTT. Centralizes interface translations in language catalogs and lets each user choose their language in account settings.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "module",
+    "tags": [
+      "Tradu\u00e7\u00e3o",
+      "Idiomas",
+      "Interface"
+    ],
+    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.translator-v0.1.1/translator-0.1.1.zip",
+    "sha256": "77c153ff877c076f6dbc6c437e04e3b81d5610fdaaa79fbaba43d6fc2ce06255",
+    "keyId": "gravewright-2026-10",
+    "signature": "8eHUihu1FtciyeQrNwrVaVdA71neldjMSQFQFE9AbZHBeuaiaN1Nc9s1HBDnEDzJg+J3GyTsfAR+CgSUnRdPDA=="
   }
 ]
