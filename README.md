@@ -20,9 +20,12 @@ GRAVEWRIGHT_MARKETPLACE_KEYS_FILE=/absolute/path/to/marketplace/trusted-keys.jso
 
 | Package | Release | Activation |
 | --- | --- | --- |
-| [Translator](https://github.com/Gravewright/translator) | [v0.1.0 preview](https://github.com/Gravewright/translator/releases/tag/v0.1.0) | Owner: Installed modules → Activate languages. Users: internal Settings → Interface language. |
+| [Translator](https://github.com/Gravewright/translator) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright.translator-v0.1.1) | Owner: Installed modules → Activate languages. Users: internal Settings → Interface language. |
+| [Gravewright 3D Dice](https://github.com/Gravewright/Gravewright-3D-Dice) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright-3d-dice-v0.1.1) | Activate per table in Extensions; appearance preferences are personal. |
 
-Translator offers English, Brazilian Portuguese and Spanish. It requires a host with `manifest.locales` support and global language activation; older Gravewright hosts do not support this preview. It is not a per-table extension. See the package README for coverage limits and validation instructions.
+Translator offers English, Brazilian Portuguese and Spanish. It requires a host with `manifest.locales` support and global language activation. Version 0.1.1 includes current document permissions, sharing, references, window and package-management translations. See the package README for coverage limits and validation instructions.
+
+Use **Update** in installed module lists to install a newer signed release while preserving activation and saved settings. **Remove** lists affected tables for confirmation, then removes the package from those tables. Previously published package archives and signatures remain unchanged.
 
 ## Catalog format
 
