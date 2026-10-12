@@ -66,5 +66,22 @@
     "sha256": "77c153ff877c076f6dbc6c437e04e3b81d5610fdaaa79fbaba43d6fc2ce06255",
     "keyId": "gravewright-2026-10",
     "signature": "8eHUihu1FtciyeQrNwrVaVdA71neldjMSQFQFE9AbZHBeuaiaN1Nc9s1HBDnEDzJg+J3GyTsfAR+CgSUnRdPDA=="
+  },
+  {
+    "id": "gravewright.translator",
+    "name": "Translator",
+    "version": "0.1.2",
+    "description": "Translation catalogs for Gravewright VTT with reviewed Portuguese and Spanish interfaces. Includes documentation and examples for module-local translations through the host i18n API.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "module",
+    "tags": [
+      "Tradu\u00e7\u00e3o",
+      "Idiomas",
+      "Interface"
+    ],
+    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.translator-v0.1.2/translator-0.1.2.zip",
+    "sha256": "58d51f13d9cfd73e59a7a888929d10b5313af82601aaa5e199412c8c41ce650d",
+    "keyId": "gravewright-2026-10",
+    "signature": "qLDC+YXAUm8LiJ8L7nONOGYiDUDd9462pRjW0/MgxQfT9RXtieakW8tL3FjpvpTNsbvJA7fW0JEresGuxz5WBA=="
   }
 ]
