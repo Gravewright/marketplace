@@ -1,10 +1,13 @@
 import base64
+from contextlib import contextmanager
+import hashlib
 import importlib.util
+import io
 import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 import zipfile
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -45,6 +48,39 @@ class ReleaseTests(unittest.TestCase):
                     archive.writestr('compendiums/2014.json', json.dumps({'packs': [{'id': 'weapons', 'entries': []}]}))
                 if extra:
                     archive.writestr(extra, 'unexpected')
+
+    def repack(self, raw, *, changed=None, extra=None, mode=None):
+        output = io.BytesIO()
+        with zipfile.ZipFile(io.BytesIO(raw)) as original, zipfile.ZipFile(output, 'w') as destination:
+            for item in original.infolist():
+                value = (changed or {}).get(item.filename, original.read(item))
+                if mode is not None and item.filename == 'main.js':
+                    item.external_attr = mode << 16
+                destination.writestr(item, value, compress_type=zipfile.ZIP_DEFLATED)
+            if extra:
+                destination.writestr(extra, b'extra')
+        return output.getvalue()
+
+    @contextmanager
+    def published_source(self, package, raw, *, tag_sha='a' * 40, draft=False, digest=None):
+        filename = release.PACKAGES[package]['archive_prefix'] + '-0.1.0.zip'
+        record = {'draft': draft, 'tag_name': 'v0.1.0', 'assets': [{
+            'name': filename, 'state': 'uploaded', 'size': len(raw),
+            'digest': digest or 'sha256:' + hashlib.sha256(raw).hexdigest(),
+            'browser_download_url': 'https://github.com/Gravewright/dnd-srd-5e/releases/download/v0.1.0/' + filename,
+        }]}
+
+        def api(repository, path):
+            self.assertEqual(repository, 'Gravewright/dnd-srd-5e')
+            if path == 'git/ref/tags/v0.1.0':
+                return {'object': {'type': 'commit', 'sha': tag_sha}}
+            if path == 'releases/tags/v0.1.0':
+                return record
+            self.fail('Unexpected GitHub API path: ' + path)
+
+        with patch.object(release, 'github_json', side_effect=api), \
+                patch.object(release, 'download', return_value=raw) as download:
+            yield download
 
     def test_record_is_bound_to_archive_version_and_central_release(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -89,12 +125,66 @@ class ReleaseTests(unittest.TestCase):
             self.paired_source(root / 'source')
             for key, kind in [('dnd5e', 'system'), ('dnd5e-server', 'django')]:
                 destination = root / key
-                archive, record, tag = release.prepare(key, root / 'source', destination, 'a' * 40)
+                filename = release.PACKAGES[key]['archive_prefix'] + '-0.1.0.zip'
+                built = (root / 'source/dist' / filename).read_bytes()
+                public = self.repack(built)
+                self.assertNotEqual(built, public)
+                with self.published_source(key, public):
+                    archive, record, tag = release.prepare(key, root / 'source', destination, 'a' * 40)
                 self.assertEqual(list(destination.glob('*.zip')), [archive])
+                self.assertEqual(archive.read_bytes(), public)
+                self.assertEqual(record['sha256'], hashlib.sha256(public).hexdigest())
                 self.assertEqual(record['type'], kind)
                 self.assertEqual(record['name'], release.PACKAGES[key]['name'])
                 self.assertEqual(tag, release.PACKAGES[key]['id'] + '-v0.1.0')
                 self.assertNotIn('dependencies', record)
+
+    def test_changed_source_release_payload_or_modes_are_rejected(self):
+        for changes in [{'changed': {'main.js': b'adulterated'}}, {'mode': 0o100755},
+                        {'extra': 'surprise.txt'}, {'extra': 'MAIN.JS'}]:
+            with self.subTest(changes=changes), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                self.paired_source(root / 'source')
+                built = (root / 'source/dist/gravewright-5e-srd-0.1.0.zip').read_bytes()
+                with self.published_source('dnd5e', self.repack(built, **changes)):
+                    with self.assertRaises(ValueError):
+                        release.prepare('dnd5e', root / 'source', root / 'release', 'a' * 40)
+                self.assertEqual(list((root / 'release').iterdir()), [])
+
+    def test_source_release_requires_exact_tag_public_release_and_verified_digest(self):
+        for changes in [{'tag_sha': 'b' * 40}, {'draft': True}, {'digest': 'sha256:' + '0' * 64}]:
+            with self.subTest(changes=changes), self.published_source('dnd5e', b'archive', **changes):
+                with self.assertRaises(ValueError):
+                    release.source_release_archive('dnd5e', '0.1.0', 'gravewright-5e-srd-0.1.0.zip', 'a' * 40)
+
+    def test_annotated_source_tag_is_resolved_to_approved_commit(self):
+        raw = b'published archive'
+        name = 'gravewright-5e-srd-0.1.0.zip'
+        responses = [
+            {'object': {'type': 'tag', 'sha': 'b' * 40}},
+            {'object': {'type': 'commit', 'sha': 'a' * 40}},
+            {'draft': False, 'tag_name': 'v0.1.0', 'assets': [{
+                'name': name, 'state': 'uploaded', 'size': len(raw),
+                'digest': 'sha256:' + hashlib.sha256(raw).hexdigest(),
+                'browser_download_url': 'https://github.com/Gravewright/dnd-srd-5e/releases/download/v0.1.0/' + name,
+            }]},
+        ]
+        with patch.object(release, 'github_json', side_effect=responses) as api, \
+                patch.object(release, 'download', return_value=raw):
+            self.assertEqual(release.source_release_archive('dnd5e', '0.1.0', name, 'a' * 40), raw)
+        self.assertEqual(api.call_args_list[1].args[1], 'git/tags/' + 'b' * 40)
+
+    def test_public_asset_download_never_receives_the_api_token(self):
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.headers = {}
+        response.read.return_value = b'archive'
+        with patch.object(release, 'urlopen', return_value=response) as request, \
+                patch.dict(release.os.environ, {'GH_TOKEN': 'temporary-test-token'}):
+            release.download('https://github.com/Gravewright/dnd-srd-5e/releases/download/v0.1.0/test.zip', 64)
+            self.assertIsNone(request.call_args.args[0].get_header('Authorization'))
+            release.download('https://api.github.com/repos/Gravewright/dnd-srd-5e', 64, api=True)
+            self.assertEqual(request.call_args.args[0].get_header('Authorization'), 'Bearer temporary-test-token')
 
     def test_mismatched_paired_versions_are_rejected_before_selection(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -26,9 +26,16 @@ Keep the stable IDs `gravewright.5e-srd` and `gravewright.5e-srd-server`; displa
 names are **DnD 5e SRD** and **DnD 5e SRD - Server Rules**. Both manifests must
 declare the same version.
 
-Dispatch `dnd5e-server` first, then `dnd5e`, using the **same full source commit
-SHA**. Each dispatch tests the source, builds both artifacts and selects one ZIP
-for approval and signing. The workflow serializes releases to prevent concurrent
+Publish the source repository's public `v{version}` release and its versioned ZIP
+assets first. Dispatch `dnd5e-server`, then `dnd5e`, using the **same full source
+commit SHA**. Each dispatch tests the source and builds both artifacts. It checks
+that the source Git tag resolves to that exact commit, then downloads the selected
+public release ZIP with its GitHub SHA-256 and size checks. Every ZIP path,
+permission and uncompressed file must match the tested build; extra entries,
+duplicates and changed payloads are rejected. The original published ZIP bytes
+become the sole artifact for approval and signing. This preserves one immutable
+ID/version archive even when zlib and zlib-ng produce different DEFLATE streams.
+The workflow serializes releases to prevent concurrent
 catalog pushes. Publishing the companion first makes its required download
 available before offering the browser system.
 
@@ -41,8 +48,9 @@ After building, `scripts/validate_package.py` checks generated data, translation
 compendiums, provenance, exact ZIP contents, CRCs, SHA-256 and licensing notices.
 
 `scripts/release.py prepare` checks paired identities, versions, names and package
-types, selects the expected versioned archive, checks safe ZIP paths and requires
-the archive manifest to match the tested source. The browser record is
+types, requires the public source release, selects its expected versioned archive,
+checks safe ZIP paths and compares its entire payload with the tested build.
+The archive manifest must match the tested source. The browser record is
 `type: "system"`; the server companion is `type: "django"`, requiring explicit
 host-owner activation and a managed Runner restart. The signing job never checks
 out or executes source-package code.

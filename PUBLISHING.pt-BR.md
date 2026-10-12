@@ -27,10 +27,17 @@ O código de origem fica em `Gravewright/dnd-srd-5e`. Preserve os IDs técnicos
 com as mesas existentes. Os nomes exibidos são **DnD 5e SRD** e
 **DnD 5e SRD - Server Rules**. Os dois manifests precisam ter a mesma versão.
 
-Execute o workflow duas vezes, sequencialmente, com o **mesmo SHA completo** do
-repositório de origem: primeiro `dnd5e-server`, depois `dnd5e`. Cada execução
-testa e constrói a origem, seleciona apenas o ZIP correspondente e requer a
-aprovação do ambiente protegido. A concorrência do workflow impede que duas
+Publique primeiro a release pública `v{versão}` no repositório de origem, com
+seus ZIPs versionados. Execute o workflow duas vezes, sequencialmente, com o
+**mesmo SHA completo** da origem: primeiro `dnd5e-server`, depois `dnd5e`.
+Cada execução testa e constrói a origem, confirma que a tag Git da release aponta
+para esse commit e baixa o ZIP público correspondente. O tamanho e o SHA-256
+precisam conferir com os metadados do GitHub. Todos os caminhos, permissões e
+arquivos descompactados precisam ser idênticos ao build testado; entradas extras,
+duplicadas ou adulteradas são rejeitadas. Os bytes originais da release pública
+formam o único ZIP enviado para aprovação e assinatura. Assim, a mesma identidade
+ID/versão preserva seu arquivo imutável mesmo quando zlib e zlib-ng produzem
+compressões DEFLATE diferentes. A concorrência do workflow impede que duas
 publicações disputem a atualização do catálogo. O primeiro registro disponibiliza
 o complemento de servidor antes de oferecer o sistema que depende dele.
 
@@ -43,8 +50,9 @@ traduções, compêndios, proveniência, arquivos exatos dos ZIPs, CRC, SHA-256 
 avisos de licença. Reconstruir os compêndios a partir dos PDFs/YAMLs licenciados é uma
 operação separada no projeto de origem, com suas fontes e hashes fixos.
 
-`scripts/release.py prepare` confere IDs, nomes, tipos, versões, igualdade entre
-o manifest da origem e o do ZIP, caminhos seguros e presença dos compêndios.
+`scripts/release.py prepare` confere IDs, nomes, tipos, versões, release pública
+de origem, igualdade entre o manifest da origem e o do ZIP, caminhos seguros,
+presença dos compêndios e todo o conteúdo do arquivo publicado contra o build.
 `dnd5e` gera um registro `type: "system"`; `dnd5e-server`, `type: "django"`.
 Nunca publique o complemento como módulo comum para evitar esconder que ele
 contém código Python confiável. O job de assinatura recebe apenas o ZIP

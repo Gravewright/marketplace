@@ -82,11 +82,12 @@ jobs:
           python -m unittest discover -s tests -p test_build.py
           python -c "from django.conf import settings; settings.configure(INSTALLED_APPS=['gravewright_translator'], SECRET_KEY='release-build'); import django; django.setup(); from django.core.management import call_command; call_command('build_translator', output='dist')"
       - if: startsWith(inputs.package, 'dnd5e')
-        name: Select the matching immutable system or server artifact
+        name: Verify and select the immutable public source release archive
         run: python scripts/release.py prepare --package "$PACKAGE" --source-sha "$SOURCE_SHA"
         env:
           PACKAGE: ${{ inputs.package }}
           SOURCE_SHA: ${{ steps.source.outputs.sha }}
+          GH_TOKEN: ${{ github.token }}
       - if: ${{ !startsWith(inputs.package, 'dnd5e') }}
         run: |
           mkdir release

@@ -2,14 +2,15 @@
 import argparse
 import base64
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
 import re
-import shutil
 import stat
 import subprocess
 import tempfile
+from urllib.request import Request, urlopen
 import zipfile
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -56,6 +57,79 @@ def validate_manifest(package, manifest):
             raise ValueError('Signed display fields must be nonempty ASCII strings.')
 
 
+def download(url, limit, *, api=False):
+    headers = {'User-Agent': 'Gravewright-Marketplace-Publisher'}
+    if api:
+        headers.update(Accept='application/vnd.github+json', **{'X-GitHub-Api-Version': '2022-11-28'})
+        if os.environ.get('GH_TOKEN'):
+            headers['Authorization'] = 'Bearer ' + os.environ['GH_TOKEN']
+    # Public release downloads deliberately receive no token, including redirects.
+    with urlopen(Request(url, headers=headers), timeout=60) as response:
+        if int(response.headers.get('Content-Length', '0')) > limit:
+            raise ValueError('Source release download exceeds its byte quota.')
+        raw = response.read(limit + 1)
+    if len(raw) > limit:
+        raise ValueError('Source release download exceeds its byte quota.')
+    return raw
+
+
+def github_json(repository, path):
+    return json.loads(download(f'https://api.github.com/repos/{repository}/{path}', 2 * 1024 * 1024, api=True))
+
+
+def source_release_archive(package, version, filename, source_sha):
+    """Require a public source release tied to the exact tested Git commit."""
+    repository = PACKAGES[package]['repo']
+    tag = 'v' + version
+    target = github_json(repository, 'git/ref/tags/' + tag)['object']
+    for _ in range(5):
+        if target.get('type') != 'tag':
+            break
+        if not re.fullmatch('[0-9a-f]{40}', target.get('sha', '')):
+            raise ValueError('Invalid source Git tag object.')
+        target = github_json(repository, 'git/tags/' + target['sha'])['object']
+    if target.get('type') != 'commit' or target.get('sha') != source_sha:
+        raise ValueError('The source release tag does not identify the tested commit.')
+    release = github_json(repository, 'releases/tags/' + tag)
+    if release.get('draft') is not False or release.get('tag_name') != tag:
+        raise ValueError('A published source release with the expected version is required.')
+    assets = [item for item in release.get('assets', []) if item.get('name') == filename]
+    if len(assets) != 1:
+        raise ValueError('Expected one published source release asset with the selected filename.')
+    asset = assets[0]
+    expected_url = f'https://github.com/{repository}/releases/download/{tag}/{filename}'
+    if (asset.get('state') != 'uploaded' or asset.get('browser_download_url') != expected_url
+            or type(asset.get('size')) is not int or not 0 < asset['size'] <= 64 * 1024 * 1024
+            or not re.fullmatch('sha256:[0-9a-f]{64}', asset.get('digest') or '')):
+        raise ValueError('Invalid source release asset URL, size or SHA-256 metadata.')
+    raw = download(expected_url, 64 * 1024 * 1024)
+    if len(raw) != asset['size'] or 'sha256:' + hashlib.sha256(raw).hexdigest() != asset['digest']:
+        raise ValueError('Source release asset size or digest does not match the GitHub metadata.')
+    return raw
+
+
+def archive_payload(raw):
+    """Read bounded, safe entries; compare payload and modes across compressors."""
+    if len(raw) > 64 * 1024 * 1024:
+        raise ValueError('The archive exceeds the host package quota.')
+    with zipfile.ZipFile(io.BytesIO(raw)) as contents:
+        entries = contents.infolist()
+        if not entries or len(entries) > 4096 or sum(item.file_size for item in entries) > 256 * 1024 * 1024:
+            raise ValueError('The expanded archive exceeds the host package quota.')
+        names, payload = set(), {}
+        for item in entries:
+            name = item.filename.rstrip('/')
+            mode = item.external_attr >> 16
+            if (not name or name.startswith('/') or '\\' in name or ':' in name
+                    or any(part in {'', '.', '..'} for part in name.split('/'))
+                    or name.casefold() in names or item.flag_bits & 1
+                    or stat.S_IFMT(mode) not in {0, stat.S_IFREG, stat.S_IFDIR}):
+                raise ValueError('Unsafe or duplicate archive entry.')
+            names.add(name.casefold())
+            payload[item.filename] = (mode, item.is_dir(), contents.read(item))
+        return payload
+
+
 def prepare(package, source, directory, source_sha):
     """Select one tested 5e artifact, preserving the one-ZIP signing boundary."""
     if package not in {'dnd5e', 'dnd5e-server'}:
@@ -100,7 +174,12 @@ def prepare(package, source, directory, source_sha):
                 collection = json.loads(contents.read(path))
                 if not isinstance(collection.get('packs'), list) or not collection['packs']:
                     raise ValueError('Invalid compiled compendium collection.')
-    shutil.copyfile(archive, directory / filename)
+    published = source_release_archive(package, expected['version'], filename, source_sha)
+    if archive_payload(published) != archive_payload(archive.read_bytes()):
+        raise ValueError('Published source release payload differs from the tested build.')
+    # Preserve already published bytes: DEFLATE output can vary between zlib
+    # and zlib-ng even when every uncompressed file and permission is identical.
+    (directory / filename).write_bytes(published)
     return describe(package, directory, source_sha)
 
 
