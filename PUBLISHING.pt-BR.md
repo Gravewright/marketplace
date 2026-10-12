@@ -1,7 +1,7 @@
 # Publicação e chaves de assinatura
 
 O workflow **Sign and publish package** deste repositório gera os pacotes do
-3D Dice e do Translator a partir de seus repositórios públicos. Os novos ZIPs,
+3D Dice, do Translator e do DnD 5e SRD a partir de seus repositórios públicos. Os novos ZIPs,
 checksums, registros assinados e a referência ao commit de origem são publicados
 nas Releases do Marketplace. Versões anteriores mantêm seus endereços e assinaturas.
 
@@ -14,10 +14,51 @@ nas Releases do Marketplace. Versões anteriores mantêm seus endereços e assin
    resolvido e o SHA-256 no resumo da execução e o artefato disponível para download.
 4. Um responsável configurado no ambiente `release-signing` aprova a publicação
    em **Review deployments**. A aprovação libera o job que assina e publica.
-5. O workflow publica uma Release imutável por versão e acrescenta o registro
+5. O workflow publica uma Release imutável por versão, baixa novamente o ZIP
+   público e confere seu SHA-256 antes de acrescentar o registro
    assinado ao catálogo. Se o push do catálogo falhar, o registro fica em
    `catalog.json` na Release: revise e incorpore esse registro ao catálogo,
    executando `python scripts/validate_catalog.py`. Não substitua o ZIP publicado.
+
+## Publicar DnD 5e SRD
+
+O código de origem fica em `Gravewright/dnd-srd-5e`. Preserve os IDs técnicos
+`gravewright.5e-srd` e `gravewright.5e-srd-server` para manter a compatibilidade
+com as mesas existentes. Os nomes exibidos são **DnD 5e SRD** e
+**DnD 5e SRD - Server Rules**. Os dois manifests precisam ter a mesma versão.
+
+Execute o workflow duas vezes, sequencialmente, com o **mesmo SHA completo** do
+repositório de origem: primeiro `dnd5e-server`, depois `dnd5e`. Cada execução
+testa e constrói a origem, seleciona apenas o ZIP correspondente e requer a
+aprovação do ambiente protegido. A concorrência do workflow impede que duas
+publicações disputem a atualização do catálogo. O primeiro registro disponibiliza
+o complemento de servidor antes de oferecer o sistema que depende dele.
+
+O build usa um checkout fixo do VTT 0.2.1 apenas para testes da API oficial e
+do backend, com `GRAVEWRIGHT_TEST_HOST_ROOT`. As dependências do VTT vêm do
+seu `uv.lock`; não entram nos ZIPs. Os testes JavaScript, catálogos de idiomas e
+regras de servidor são verificados. O build usa os compêndios SRD já gerados e
+validados. Após o build, `scripts/validate_package.py` verifica os dados gerados,
+traduções, compêndios, proveniência, arquivos exatos dos ZIPs, CRC, SHA-256 e
+avisos de licença. Reconstruir os compêndios a partir dos PDFs/YAMLs licenciados é uma
+operação separada no projeto de origem, com suas fontes e hashes fixos.
+
+`scripts/release.py prepare` confere IDs, nomes, tipos, versões, igualdade entre
+o manifest da origem e o do ZIP, caminhos seguros e presença dos compêndios.
+`dnd5e` gera um registro `type: "system"`; `dnd5e-server`, `type: "django"`.
+Nunca publique o complemento como módulo comum para evitar esconder que ele
+contém código Python confiável. O job de assinatura recebe apenas o ZIP
+aprovado; não faz checkout nem executa código do sistema.
+
+O catálogo atual aceita somente os campos documentados no README. Requisitos
+como **VTT 0.2.1**, a instalação do complemento na mesma versão e Translator
+para idiomas adicionais devem estar na descrição e na documentação: não
+acrescente campos `dependencies` ou `minimumHost`, pois o host os rejeita.
+O SDK continua `>=1.0.0 <2.0.0`; esse intervalo não substitui o requisito de VTT.
+
+Depois de ambas as publicações, confirme as assinaturas, baixe os ZIPs públicos
+e teste sua instalação no VTT 0.2.1. Só então atualize os links de disponibilidade
+da documentação. Pacotes, registros e assinaturas já publicados são imutáveis.
 
 O ambiente aceita somente a branch `main`. A chave privada fica no Secret de
 ambiente `SIGNING_PRIVATE_KEY`; seu identificador fica na variável de ambiente

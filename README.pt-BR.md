@@ -20,9 +20,28 @@ O catálogo usa uma lista JSON de registros assinados. O formato antigo com `sch
 
 ## Translator
 
-Instale [Translator v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright.translator-v0.1.1) e, em **Módulos instalados**, ative os idiomas. O seletor aparece somente nas configurações internas da conta: inglês, português do Brasil e espanhol. A ativação é global; a preferência é individual.
+Instale [Translator v0.1.2](https://github.com/Gravewright/marketplace/releases/tag/gravewright.translator-v0.1.2) e, em **Módulos instalados**, ative os idiomas. O seletor aparece somente nas configurações internas da conta: inglês, português do Brasil e espanhol. A ativação é global; a preferência é individual.
 
-Esta versão exige um host com suporte a `manifest.locales` e à ativação global. Inclui os textos atuais de permissões, compartilhamento, referências, janelas e gerenciamento de pacotes. A cobertura e os limites estão documentados no [repositório Translator](https://github.com/Gravewright/translator).
+Esta versão exige um host com suporte a `manifest.locales` e à ativação global. Inclui catálogos revisados e documentação para outros módulos usarem a API oficial de tradução. A cobertura e os limites estão documentados no [repositório Translator](https://github.com/Gravewright/translator).
+
+## DnD 5e SRD
+
+[DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) 0.1.0 Alpha oferece os
+perfis de regras de 2014 (SRD 5.1) e 2024 (SRD 5.2.1). Exige **Gravewright VTT
+0.2.1 ou posterior**. Após a entrada das releases assinadas no catálogo, instale
+o pacote do navegador em **Sistemas** e selecione-o ao criar a mesa. Instale
+**DnD 5e SRD - Server Rules**, na mesma versão, em **Módulos**. Como proprietário
+do host, ative essa extensão Django pelo Runner gerenciado; a ativação reinicia
+o servidor e fornece as automações de combate do sistema. O core não contém
+regras de D&D. Instale e ative o Translator 0.1.2 para a interface em português
+ou espanhol; o conteúdo dos compêndios SRD permanece em inglês.
+
+Os dois pacotes são assinados separadamente: `gravewright.5e-srd`
+(`type: "system"`) e `gravewright.5e-srd-server` (`type: "django"`). O nome
+exibido não altera os identificadores usados nas mesas salvas. Instalar e ativar
+são operações distintas; o catálogo não resolve dependências automaticamente
+nem impõe uma versão mínima da aplicação VTT. Veja no repositório do sistema as
+licenças, automações disponíveis e limitações.
 
 ## Gravewright 3D Dice
 
@@ -36,6 +55,6 @@ Validação local: `python scripts/validate_catalog.py` em um ambiente com `cryp
 
 ## Categorias definidas pelo criador
 
-O registro pode incluir `"type": "module"` (ou `"system"`) e `"tags": ["Tradução", "Idiomas", "Interface"]`. A modal do VTT gera suas categorias a partir dessas tags, separadamente para sistemas e módulos. São aceitas até 24 tags únicas, não vazias, de até 64 caracteres, incluindo acentos.
+O registro pode incluir `"type": "module"`, `"system"` ou `"django"` e `"tags": ["Tradução", "Idiomas", "Interface"]`. A modal do VTT gera suas categorias a partir dessas tags, separadamente para sistemas e módulos. São aceitas até 24 tags únicas, não vazias, de até 64 caracteres, incluindo acentos. Pacotes Django precisam de ativação explícita pelo proprietário do host, via Runner gerenciado; instalar o ZIP não importa seu código Python automaticamente.
 
 As tags fazem parte da assinatura. Alterá-las exige assinar novamente o registro; o ZIP e seu SHA-256 podem permanecer iguais se o pacote não mudou. Este formato exige o suporte a tags do host atualizado.

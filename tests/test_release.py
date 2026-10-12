@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -21,6 +22,29 @@ class ReleaseTests(unittest.TestCase):
         manifest.update(changes)
         with zipfile.ZipFile(directory / 'dice.zip', 'w') as archive:
             archive.writestr('manifest.json', json.dumps(manifest))
+
+    def paired_source(self, source, *, server_version='0.1.0', archive_changes=None, extra=None):
+        (source / 'server').mkdir(parents=True, exist_ok=True)
+        (source / 'dist').mkdir(exist_ok=True)
+        for key in ('dnd5e', 'dnd5e-server'):
+            package = release.PACKAGES[key]
+            manifest = {'id': package['id'], 'name': package['name'],
+                        'version': server_version if key == 'dnd5e-server' else '0.1.0',
+                        'sdk': {'requires': '>=1.0.0 <2.0.0'}}
+            if key == 'dnd5e':
+                manifest.update(system={'actorTypes': []}, entry='main.js',
+                                content={'compendiums': ['compendiums/2014.json']})
+            else:
+                manifest['django'] = {'apps': ['gravewright_5e.apps.Gravewright5eConfig']}
+            release.write(source / package['manifest'], manifest)
+            archived = {**manifest, **((archive_changes or {}).get(key, {}))}
+            with zipfile.ZipFile(source / 'dist' / f"{package['archive_prefix']}-{manifest['version']}.zip", 'w') as archive:
+                archive.writestr('manifest.json', json.dumps(archived))
+                if key == 'dnd5e':
+                    archive.writestr('main.js', 'export default {};')
+                    archive.writestr('compendiums/2014.json', json.dumps({'packs': [{'id': 'weapons', 'entries': []}]}))
+                if extra:
+                    archive.writestr(extra, 'unexpected')
 
     def test_record_is_bound_to_archive_version_and_central_release(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -58,6 +82,84 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(keys['old'], 'unchanged')
         with self.assertRaises(ValueError):
             release.sign_record(record, pem, 'old', keys)
+
+    def test_paired_artifacts_publish_as_system_and_trusted_django_packages(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.paired_source(root / 'source')
+            for key, kind in [('dnd5e', 'system'), ('dnd5e-server', 'django')]:
+                destination = root / key
+                archive, record, tag = release.prepare(key, root / 'source', destination, 'a' * 40)
+                self.assertEqual(list(destination.glob('*.zip')), [archive])
+                self.assertEqual(record['type'], kind)
+                self.assertEqual(record['name'], release.PACKAGES[key]['name'])
+                self.assertEqual(tag, release.PACKAGES[key]['id'] + '-v0.1.0')
+                self.assertNotIn('dependencies', record)
+
+    def test_mismatched_paired_versions_are_rejected_before_selection(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.paired_source(root / 'source', server_version='0.1.1')
+            with self.assertRaisesRegex(ValueError, 'versions must match'):
+                release.prepare('dnd5e', root / 'source', root / 'release', 'a' * 40)
+
+    def test_stale_manifest_unsafe_paths_and_duplicate_entries_are_rejected(self):
+        for changes, extra in [({'dnd5e': {'description': 'stale archive'}}, None),
+                               ({}, '../outside'), ({}, 'MAIN.JS')]:
+            with self.subTest(changes=changes, extra=extra), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                self.paired_source(root / 'source', archive_changes=changes, extra=extra)
+                with self.assertRaises(ValueError):
+                    release.prepare('dnd5e', root / 'source', root / 'release', 'a' * 40)
+
+    def test_manifest_cannot_disguise_trusted_server_as_browser_module(self):
+        for key, change in [('dnd5e', {'system': None, 'django': {'apps': ['example']}}),
+                            ('dnd5e-server', {'system': {}})]:
+            package = release.PACKAGES[key]
+            manifest = {'id': package['id'], 'name': package['name'], 'version': '0.1.0', **change}
+            with self.subTest(package=key), self.assertRaises(ValueError):
+                release.validate_manifest(package, manifest)
+
+    def test_signed_display_fields_remain_compatible_with_host_ascii_contract(self):
+        package = release.PACKAGES['dnd5e']
+        manifest = {'id': package['id'], 'name': package['name'], 'version': '0.1.0',
+                    'system': {}, 'description': 'Tradução'}
+        with self.assertRaisesRegex(ValueError, 'ASCII'):
+            release.validate_manifest(package, manifest)
+
+    def test_failed_public_download_never_updates_catalog(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            directory = root / 'release'
+            directory.mkdir()
+            self.archive(directory)
+            _, record, _ = release.describe('dice3d', directory, 'a' * 40)
+            key = Ed25519PrivateKey.generate()
+            pem = key.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption())
+            keys = {'test': base64.b64encode(key.public_key().public_bytes_raw()).decode()}
+            signed = release.sign_record(record, pem, 'test', keys)
+            release.write(directory / 'catalog.json', [signed])
+            release.write(root / 'trusted-keys.json', keys)
+            release.write(root / 'gravewright.marketplace.json', [])
+            calls = []
+
+            def run(command, **kwargs):
+                calls.append(command)
+                if command[:3] == ['gh', 'release', 'download']:
+                    destination = Path(command[command.index('--dir') + 1])
+                    (destination / 'dice.zip').write_bytes(b'wrong bytes')
+
+            args = ['release.py', 'publish', '--package', 'dice3d', '--directory', str(directory),
+                    '--source-sha', 'a' * 40]
+            with patch.object(release, 'ROOT', root), patch.object(release.subprocess, 'run', side_effect=run), \
+                    patch('sys.argv', args), patch.dict(release.os.environ, {'GITHUB_SHA': 'b' * 40}):
+                with self.assertRaisesRegex(ValueError, 'differs from the approved archive'):
+                    release.main()
+            self.assertEqual(release.read(root / 'gravewright.marketplace.json'), [])
+            self.assertFalse(any(command[0] == 'git' for command in calls))
+            publish = next(command for command in calls if command[:3] == ['gh', 'release', 'edit'])
+            self.assertEqual(publish[publish.index('--tag') + 1], 'gravewright-3d-dice-v0.1.1')
+            self.assertEqual(publish[publish.index('--target') + 1], 'b' * 40)
 
 
 if __name__ == '__main__':

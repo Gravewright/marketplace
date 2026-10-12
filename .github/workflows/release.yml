@@ -6,7 +6,7 @@ on:
         description: Package to build
         required: true
         type: choice
-        options: [dice3d, translator]
+        options: [dice3d, translator, dnd5e, dnd5e-server]
       ref:
         description: Source commit SHA, tag or branch (resolved before approval)
         required: true
@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ${{ inputs.package == 'dice3d' && 'Gravewright/Gravewright-3D-Dice' || 'Gravewright/translator' }}
+          repository: ${{ inputs.package == 'dice3d' && 'Gravewright/Gravewright-3D-Dice' || inputs.package == 'translator' && 'Gravewright/translator' || 'Gravewright/dnd-srd-5e' }}
           ref: ${{ inputs.ref }}
           path: source
           persist-credentials: false
@@ -45,6 +45,31 @@ jobs:
         with:
           node-version: '24'
       - run: python -m pip install 'cryptography==50.0.2' 'Django==5.2.18'
+      - if: startsWith(inputs.package, 'dnd5e')
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Gravewright/gravewright
+          ref: b8486abe68c13a042315fcaf7800b51c53a55dec # v0.2.1
+          path: host-vtt
+          persist-credentials: false
+      - if: startsWith(inputs.package, 'dnd5e')
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.13'
+          python-version: '3.14'
+          enable-cache: true
+      - if: startsWith(inputs.package, 'dnd5e')
+        name: Validate system, translations, compendiums and server rules
+        working-directory: source
+        env:
+          GRAVEWRIGHT_TEST_HOST_ROOT: ${{ github.workspace }}/host-vtt
+        run: |
+          uv sync --project ../host-vtt --locked --no-dev
+          npm test
+          python scripts/validate_locales.py
+          ../host-vtt/.venv/bin/python -X utf8 server/run_tests.py
+          python scripts/build.py
+          python scripts/validate_package.py
       - if: inputs.package == 'dice3d'
         working-directory: source
         run: |
@@ -56,9 +81,17 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_build.py
           python -c "from django.conf import settings; settings.configure(INSTALLED_APPS=['gravewright_translator'], SECRET_KEY='release-build'); import django; django.setup(); from django.core.management import call_command; call_command('build_translator', output='dist')"
-      - run: |
+      - if: startsWith(inputs.package, 'dnd5e')
+        name: Select the matching immutable system or server artifact
+        run: python scripts/release.py prepare --package "$PACKAGE" --source-sha "$SOURCE_SHA"
+        env:
+          PACKAGE: ${{ inputs.package }}
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+      - if: ${{ !startsWith(inputs.package, 'dnd5e') }}
+        run: |
           mkdir release
           cp source/dist/*.zip release/
+      - run: |
           python scripts/release.py inspect --package "$PACKAGE" --source-sha "$SOURCE_SHA"
         env:
           PACKAGE: ${{ inputs.package }}
