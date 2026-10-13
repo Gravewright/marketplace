@@ -28,8 +28,14 @@ Esta versão exige um host com suporte a `manifest.locales` e à ativação glob
 
 [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) 0.1.0 Alpha oferece os
 perfis de regras de 2014 (SRD 5.1) e 2024 (SRD 5.2.1). Exige **Gravewright VTT
-0.2.1 ou posterior**. Após a entrada das releases assinadas no catálogo, instale
-o pacote do navegador em **Sistemas** e selecione-o ao criar a mesa. Instale
+0.2.1 ou posterior**. Os dois pacotes assinados estão disponíveis no Marketplace.
+
+| Pacote | Versão | Instalação |
+| --- | --- | --- |
+| [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) | [v0.1.0 Alpha](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-v0.1.0) | Instale em Sistemas e selecione ao criar a mesa. |
+| [DnD 5e SRD - Server Rules](https://github.com/Gravewright/dnd-srd-5e/blob/main/server/README.md) | [v0.1.0 Alpha](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-server-v0.1.0) | Proprietário do host: instale em Módulos e ative a extensão Django pelo Runner gerenciado. |
+
+Instale o pacote do navegador em **Sistemas** e selecione-o ao criar a mesa. Instale
 **DnD 5e SRD - Server Rules**, na mesma versão, em **Módulos**. Como proprietário
 do host, ative essa extensão Django pelo Runner gerenciado; a ativação reinicia
 o servidor e fornece as automações de combate do sistema. O core não contém

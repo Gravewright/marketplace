@@ -23,6 +23,8 @@ GRAVEWRIGHT_MARKETPLACE_KEYS_FILE=/absolute/path/to/marketplace/trusted-keys.jso
 | --- | --- | --- |
 | [Translator](https://github.com/Gravewright/translator) | [v0.1.2](https://github.com/Gravewright/marketplace/releases/tag/gravewright.translator-v0.1.2) | Owner: Installed modules → Activate languages. Users: internal Settings → Interface language. |
 | [Gravewright 3D Dice](https://github.com/Gravewright/Gravewright-3D-Dice) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright-3d-dice-v0.1.1) | Activate per table in Extensions; appearance preferences are personal. |
+| [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) | [v0.1.0 Alpha](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-v0.1.0) | Install under Systems; select when creating a table. Requires VTT 0.2.1+ and the server companion below. |
+| [DnD 5e SRD - Server Rules](https://github.com/Gravewright/dnd-srd-5e/blob/main/server/README.md) | [v0.1.0 Alpha](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-server-v0.1.0) | Host owner: install under Modules and activate the trusted Django extension through the managed Runner. |
 
 Translator offers English, Brazilian Portuguese and Spanish. It requires a host with `manifest.locales` support and global language activation. Version 0.1.2 includes reviewed interface catalogs and module integration documentation. See the package README for coverage limits and validation instructions.
 
@@ -30,8 +32,8 @@ Translator offers English, Brazilian Portuguese and Spanish. It requires a host 
 
 [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) 0.1.0 Alpha supports
 2014 (SRD 5.1) and 2024 (SRD 5.2.1) rule profiles. It requires **Gravewright
-VTT 0.2.1 or later**. Once its signed releases are in the catalog, install the
-browser package from **Systems** and select it when creating a table. Install
+VTT 0.2.1 or later**. Both signed packages are available in the Marketplace.
+Install the browser package from **Systems** and select it when creating a table. Install
 **DnD 5e SRD - Server Rules** with the same version from **Modules**, then activate
 the trusted Django extension as the host owner through the managed Runner. This
 restarts the server and supplies system-owned combat automation. The core has no
