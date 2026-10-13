@@ -83,5 +83,24 @@
     "sha256": "58d51f13d9cfd73e59a7a888929d10b5313af82601aaa5e199412c8c41ce650d",
     "keyId": "gravewright-2026-10",
     "signature": "qLDC+YXAUm8LiJ8L7nONOGYiDUDd9462pRjW0/MgxQfT9RXtieakW8tL3FjpvpTNsbvJA7fW0JEresGuxz5WBA=="
+  },
+  {
+    "id": "gravewright.5e-srd-server",
+    "name": "DnD 5e SRD - Server Rules",
+    "version": "0.1.0",
+    "description": "Server companion for DnD 5e SRD: system-owned initiative, combat resources and turn effects for the 2014/2024 rules. Requires Gravewright VTT 0.2.1 or newer and host-owner activation as trusted Django code.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "django",
+    "tags": [
+      "D&D",
+      "5e",
+      "SRD",
+      "Automa\u00e7\u00f5es",
+      "Servidor"
+    ],
+    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.5e-srd-server-v0.1.0/gravewright-5e-srd-server-0.1.0.zip",
+    "sha256": "c379baedde9dde85237e636773da15e03488f2899b28058127f0d054915acc01",
+    "keyId": "gravewright-2026-10",
+    "signature": "QJHTinw9kmRarEyTP2X5UfJTez6zVcWnTTAHpDw+O5uMcZ+IPjVrTPOoy1+9bYiz0TZzC9s9Sy8us+jU3fdqDQ=="
   }
 ]
