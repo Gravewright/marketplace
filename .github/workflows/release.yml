@@ -92,8 +92,8 @@ jobs:
           npm test
           node --test scripts/cards/test_decks.mjs
           python -m unittest discover -s tests -p 'test_package.py'
-          ../host-vtt/.venv/bin/python -B -X utf8 tests/run_host_tests.py
           python scripts/build.py
+          ../host-vtt/.venv/bin/python -B -X utf8 tests/run_host_tests.py
           python scripts/validate_package.py
       - if: inputs.package == 'dice3d'
         working-directory: source
