@@ -139,5 +139,23 @@
     "sha256": "f8b5cb20db836cfa81580592ab0ae000121e145503aac5ec5fd6d738754a825a",
     "keyId": "gravewright-2026-10",
     "signature": "CWEc3TPNrfEg8ASjpR0TNb2CNY15hQaAxpVrmxUHnUXaDaIuQsFO8reacOdSFt1pINKn/Lfas/1IpCJ0g0MjCQ=="
+  },
+  {
+    "id": "gravewright.savage-worlds",
+    "name": "Savage Worlds Compatibility Package for Gravewright",
+    "version": "0.1.0",
+    "description": "Original editable SWADE sheets, item templates and package-owned automation, without game content or compendiums. Requires the matching server companion and Gravewright VTT 0.2.3+ with context.host and card.asset.upload support. English by default; optional official Translator for Portuguese and Spanish.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "system",
+    "tags": [
+      "Savage Worlds",
+      "SWADE",
+      "Fichas",
+      "Automa\u00e7\u00e3o"
+    ],
+    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.savage-worlds-v0.1.0/gravewright-savage-worlds-0.1.0.zip",
+    "sha256": "b46b195b0278fcbdb29d323358e6d70508dadbd90a79ede0fc86f54e69a40c0b",
+    "keyId": "gravewright-2026-10",
+    "signature": "4xfLwL0xvRGmXxbjzR72eBqkWYuX5TYoj1COJbgVNtMoE2UD89Z14I79P3L7u3Oq3nrKHBvG1r0+pN12zcjhDw=="
   }
 ]
