@@ -123,24 +123,6 @@
     "signature": "NMPEbXD03yqHCvZHOQUmvPZb2C9dLTcPFbE8WdumpJ3YhR04AAvwYSLMXYxxX7mZmh0ykRmTpeZ/89kKIR7BCQ=="
   },
   {
-    "id": "gravewright.savage-worlds.rules",
-    "name": "Savage Worlds Compatibility Package for Gravewright - Server Rules",
-    "version": "0.1.0",
-    "description": "Trusted server companion for configured Savage Worlds effect, power and turn clocks. Requires the browser package of the same version and Gravewright VTT 0.2.3+ with context.host and card.asset.upload support. Activate as host owner through the managed Runner. Contains no catalogs or game content.",
-    "sdk": ">=1.0.0 <2.0.0",
-    "type": "django",
-    "tags": [
-      "Savage Worlds",
-      "SWADE",
-      "Automa\u00e7\u00e3o",
-      "Servidor"
-    ],
-    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.savage-worlds.rules-v0.1.0/gravewright-savage-worlds-rules-0.1.0.zip",
-    "sha256": "f8b5cb20db836cfa81580592ab0ae000121e145503aac5ec5fd6d738754a825a",
-    "keyId": "gravewright-2026-10",
-    "signature": "CWEc3TPNrfEg8ASjpR0TNb2CNY15hQaAxpVrmxUHnUXaDaIuQsFO8reacOdSFt1pINKn/Lfas/1IpCJ0g0MjCQ=="
-  },
-  {
     "id": "gravewright.savage-worlds",
     "name": "Savage Worlds Compatibility Package for Gravewright",
     "version": "0.1.0",
@@ -157,5 +139,23 @@
     "sha256": "b46b195b0278fcbdb29d323358e6d70508dadbd90a79ede0fc86f54e69a40c0b",
     "keyId": "gravewright-2026-10",
     "signature": "4xfLwL0xvRGmXxbjzR72eBqkWYuX5TYoj1COJbgVNtMoE2UD89Z14I79P3L7u3Oq3nrKHBvG1r0+pN12zcjhDw=="
+  },
+  {
+    "id": "gravewright.savage-worlds",
+    "name": "Savage Worlds Compatibility Package for Gravewright",
+    "version": "0.1.1",
+    "description": "One complete SWADE system package for Gravewright VTT 0.2.3+: editable sheets, item templates, action decks and package-owned automation through GM turn controls. Install under Systems. No game content or compendiums. English by default; official Translator for Portuguese and Spanish.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "system",
+    "tags": [
+      "Savage Worlds",
+      "SWADE",
+      "Fichas",
+      "Automa\u00e7\u00e3o"
+    ],
+    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.savage-worlds-v0.1.1/gravewright-savage-worlds-0.1.1.zip",
+    "sha256": "b9347707b8f1c05b8f38a78ca10dc94e2b9de0e47abeb82274f7a656b303d272",
+    "keyId": "gravewright-2026-10",
+    "signature": "4Y8EAdK/t/AG6yJzoqQQmd7Xq/8YobeqqeGW1DGSD9w+KzJGLq6CWMKVvUk3RSERb+puAkenekZRqZURi0bdAg=="
   }
 ]
