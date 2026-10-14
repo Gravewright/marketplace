@@ -121,5 +121,23 @@
     "sha256": "a37505b49c8b21bf0603bd99adeb7f5b28f8c2d6d8954aff7dabad8dc9c61365",
     "keyId": "gravewright-2026-10",
     "signature": "NMPEbXD03yqHCvZHOQUmvPZb2C9dLTcPFbE8WdumpJ3YhR04AAvwYSLMXYxxX7mZmh0ykRmTpeZ/89kKIR7BCQ=="
+  },
+  {
+    "id": "gravewright.savage-worlds.rules",
+    "name": "Savage Worlds Compatibility Package for Gravewright - Server Rules",
+    "version": "0.1.0",
+    "description": "Trusted server companion for configured Savage Worlds effect, power and turn clocks. Requires the browser package of the same version and Gravewright VTT 0.2.3+ with context.host and card.asset.upload support. Activate as host owner through the managed Runner. Contains no catalogs or game content.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "django",
+    "tags": [
+      "Savage Worlds",
+      "SWADE",
+      "Automa\u00e7\u00e3o",
+      "Servidor"
+    ],
+    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.savage-worlds.rules-v0.1.0/gravewright-savage-worlds-rules-0.1.0.zip",
+    "sha256": "f8b5cb20db836cfa81580592ab0ae000121e145503aac5ec5fd6d738754a825a",
+    "keyId": "gravewright-2026-10",
+    "signature": "CWEc3TPNrfEg8ASjpR0TNb2CNY15hQaAxpVrmxUHnUXaDaIuQsFO8reacOdSFt1pINKn/Lfas/1IpCJ0g0MjCQ=="
   }
 ]
