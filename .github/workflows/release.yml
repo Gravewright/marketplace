@@ -6,7 +6,7 @@ on:
         description: Package to build
         required: true
         type: choice
-        options: [dice3d, translator, dnd5e, dnd5e-server, swade, swade-server]
+        options: [dice3d, translator, dnd5e, dnd5e-server, swade]
       ref:
         description: Source commit SHA, tag or branch (resolved before approval)
         required: true
@@ -56,7 +56,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Gravewright/gravewright
-          ref: v0.2.3
+          ref: v0.2.4
           path: host-vtt
           persist-credentials: false
       - if: startsWith(inputs.package, 'swade')
@@ -95,7 +95,6 @@ jobs:
           python -m unittest discover -s server/tests -p 'test_clock*.py'
           ../host-vtt/.venv/bin/python -X utf8 server/tests/run_django_tests.py
           python scripts/build.py
-          python scripts/build_server.py
           python scripts/validate_package.py
       - if: inputs.package == 'dice3d'
         working-directory: source

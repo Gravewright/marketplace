@@ -7,7 +7,7 @@ branch. The temporary `GITHUB_TOKEN` writes only to this repository.
 
 1. Commit and push the source version. Never reuse a published package ID/version.
 2. Dispatch the workflow from `main`, selecting `dice3d`, `translator`, `dnd5e`,
-   `dnd5e-server`, `swade` or `swade-server` and the source commit SHA, tag or branch.
+   `dnd5e-server` or `swade` and the source commit SHA, tag or branch.
 3. Review the resolved full source SHA, build tests, artifact and archive SHA-256.
 4. Approve the pending deployment as an authorized environment reviewer.
 5. The workflow signs the approved ZIP, creates a release draft with the archive,
@@ -65,27 +65,28 @@ test installation in VTT 0.2.1 before updating availability links.
 ## Savage Worlds Compatibility Package for Gravewright
 
 Source repository: [Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright).
-Keep `gravewright.savage-worlds` (`system`) and `gravewright.savage-worlds.rules`
-(`django`), with matching versions. Publish the source `v{version}` release and
-both versioned ZIP assets first, then dispatch **`swade-server` before `swade`**
-with the same full source SHA. The workflow uses the same immutable source-release
-selection, public SHA-256 verification, payload comparison, approval and signing
-boundary as DnD. It never executes package code with the signing key available.
+Publish only `gravewright.savage-worlds` (`system`). Its one manifest contains
+browser entry, system metadata and `django` server automation. Publish the source
+`v{version}` release with its single system ZIP and checksum first, then dispatch
+**`swade`** with the full source SHA. The workflow verifies the immutable public
+source archive, its SHA-256 and every tested payload byte before approval and
+signing. Package code never runs with the signing key available.
 
-The browser ZIP is `gravewright-savage-worlds-{version}.zip`; the companion is
-`gravewright-savage-worlds-rules-{version}.zip`. Both must retain the exact Pinnacle
-permission notice. The browser also contains the approved logo. No compendiums,
-game content or book PDFs are included. The manifest's approved server name uses
-an em dash; its catalog display uses an ASCII hyphen for the host's signed-record
-contract. This does not change any package ID, manifest or archive.
+The ZIP is `gravewright-savage-worlds-{version}.zip`, including browser assets,
+translations and `gravewright_swade/` server code. Preserve the exact Pinnacle
+permission notice and approved logo. Include no compendiums, game content or book
+PDFs. Publication retires the old server-only catalog entry atomically when the
+verified replacement record is appended. Historical assets and signatures remain
+unchanged; the workflow no longer offers a separate server-package build.
 
-This release requires **VTT 0.2.3 or later**, which includes the generic
-`context.host` and `card.asset.upload` APIs. The workflow tests against the public
-`v0.2.3` host tag and verifies both capabilities before building. The catalog
+This release requires **VTT 0.2.4 or later**, including generic support for combined
+system packages, `context.host` and `card.asset.upload`. The workflow tests against
+the public `v0.2.4` host tag. The catalog
 cannot enforce a minimum application version; older hosts must update their core.
 Check the public archive hashes before dispatching. Install and activate the official
 Translator 0.1.2 for Portuguese or Spanish; English is the default. Installing
-the trusted server ZIP requires a separate host-owner activation and Runner restart.
+the system is followed by host-owner activation of its automation in **Systems**
+and a managed Runner restart.
 
 ## Signing keys and recovery
 

@@ -77,27 +77,27 @@ repositório; não é necessário salvar um PAT para acessar outros repositório
 ## Publicar Savage Worlds Compatibility Package for Gravewright
 
 O código está em [Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright).
-Preserve `gravewright.savage-worlds` (`system`) e `gravewright.savage-worlds.rules`
-(`django`), com versões iguais. Publique primeiro a release de origem `v{versão}`
-e os dois ZIPs versionados. Execute **`swade-server` antes de `swade`**, usando
-o mesmo SHA completo da origem nas duas execuções. O workflow usa as mesmas
-verificações de tag, SHA-256 público, conteúdo imutável, aprovação e assinatura
-do DnD. O código do pacote não é executado com acesso à chave privada.
+Publique somente `gravewright.savage-worlds` (`system`). Seu único manifest reúne
+interface, definição do sistema e automações `django`. Publique primeiro a release
+de origem `v{versão}`, com um ZIP e seu checksum. Execute **`swade`** com o SHA
+completo da origem. O workflow verifica tag, SHA-256 público e todo o conteúdo do
+pacote testado antes da aprovação e assinatura. O código do pacote não é executado
+com acesso à chave privada.
 
-Os arquivos são `gravewright-savage-worlds-{versão}.zip` e
-`gravewright-savage-worlds-rules-{versão}.zip`. Ambos preservam o aviso exato de
-permissão da Pinnacle; o navegador também contém o logo aprovado. Não incluem
-compêndios, conteúdo de jogo ou PDFs do livro. O nome aprovado no manifest do
-servidor mantém o travessão. O catálogo usa um hífen ASCII somente nessa listagem,
-como exige o contrato de registros assinados do host; IDs e ZIPs não são alterados.
+O arquivo `gravewright-savage-worlds-{versão}.zip` inclui imagens, interface,
+traduções e o código de servidor `gravewright_swade/`. Preserve o aviso exato da
+Pinnacle e o logo aprovado. Não inclua compêndios, conteúdo de jogo ou PDFs.
+O workflow retira a entrada do complemento antigo ao publicar o registro assinado
+do sistema unificado no catálogo. Arquivos e assinaturas históricos permanecem
+inalterados; o workflow não oferece mais o build de servidor separado.
 
-Exige **VTT 0.2.3 ou posterior**, que inclui as APIs genéricas `context.host` e
-`card.asset.upload`. O workflow usa a tag pública `v0.2.3` do host e verifica esses
+Exige **VTT 0.2.4 ou posterior**, com suporte genérico a sistemas completos e APIs
+`context.host` e `card.asset.upload`. O workflow usa a tag pública `v0.2.4` e verifica esses
 contratos antes do build. O catálogo não impõe versão mínima da aplicação; hosts
 anteriores precisam atualizar o core. Confira os hashes dos ZIPs públicos antes de
 executar o workflow. O idioma padrão é inglês. Para português ou espanhol, instale e
-ative o Translator oficial 0.1.2. O complemento de servidor requer ativação
-separada pelo proprietário do host e reinício pelo Runner.
+ative o Translator oficial 0.1.2. O proprietário ativa as automações no próprio
+sistema instalado em **Sistemas**, com reinício pelo Runner.
 
 ## Responsáveis e recuperação
 

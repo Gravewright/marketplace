@@ -25,6 +25,7 @@ GRAVEWRIGHT_MARKETPLACE_KEYS_FILE=/absolute/path/to/marketplace/trusted-keys.jso
 | [Gravewright 3D Dice](https://github.com/Gravewright/Gravewright-3D-Dice) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright-3d-dice-v0.1.1) | Activate per table in Extensions; appearance preferences are personal. |
 | [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) | [v0.1.0 Alpha](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-v0.1.0) | Install under Systems; select when creating a table. Requires VTT 0.2.1+ and the server companion below. |
 | [DnD 5e SRD - Server Rules](https://github.com/Gravewright/dnd-srd-5e/blob/main/server/README.md) | [v0.1.0 Alpha](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-server-v0.1.0) | Host owner: install under Modules and activate the trusted Django extension through the managed Runner. |
+| [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright.savage-worlds-v0.1.1) | One package under Systems, including its server automation. Requires VTT 0.2.4+. |
 
 Translator offers English, Brazilian Portuguese and Spanish. It requires a host with `manifest.locales` support and global language activation. Version 0.1.2 includes reviewed interface catalogs and module integration documentation. See the package README for coverage limits and validation instructions.
 
@@ -50,23 +51,24 @@ See the system repository for licensing, supported automation and limitations.
 ## Savage Worlds Compatibility Package for Gravewright
 
 [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright)
-0.1.0 provides editable SWADE sheets, blank item structures, native action-card
+0.1.1 provides editable SWADE sheets, blank item structures, native action-card
 initiative and package-owned automation. It includes no game content or compendiums.
-It requires **Gravewright VTT 0.2.3 or later**, which supplies the generic
-`context.host` and `card.asset.upload` APIs. Update older hosts before installing.
+It requires **Gravewright VTT 0.2.4 or later**, which supports browser and server
+implementation in one system package. Update older hosts before installing.
 
-The browser package uses `gravewright.savage-worlds` (`type: "system"`), installed
-under **Systems** and selected when creating a table. Its companion
-`gravewright.savage-worlds.rules` (`type: "django"`) must have the same version;
-the host owner installs it under **Modules** and activates the trusted extension
-through the managed Runner. The core supplies generic APIs; Savage Worlds rules
-remain in these packages.
+The single package uses `gravewright.savage-worlds` (`type: "system"`). Install
+it under **Systems**, enable its automation there as the host owner, then select
+it for the table. The managed Runner verifies the included server code and
+restarts. Sheets, assets and every Savage Worlds rule stay inside this system.
+Activating 0.1.1 supersedes the old server-only extension and preserves table data.
+The old extension leaves the normal Modules list; its archive remains available
+for rollback. New installations need only the system ZIP.
 
 English is the default interface language. Activate the official Translator
 0.1.2 for Brazilian Portuguese or Spanish and choose a personal language in account
 settings. In the table's **Extensions → Personalize**, choose one of three original
 action-card decks and create it in the native deck manager, or select an existing
-deck. Cards come from the configured deck. Publication uses the signed two-package
+deck. Cards come from the configured deck. Publication uses the signed single-package
 [release workflow](PUBLISHING.md#savage-worlds-compatibility-package-for-gravewright);
 the source repository documents installation, permissions and supported automation.
 

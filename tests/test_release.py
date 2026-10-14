@@ -56,6 +56,26 @@ class ReleaseTests(unittest.TestCase):
                 if extra:
                     archive.writestr(extra, 'unexpected')
 
+    def unified_swade_source(self, source, *, extra=None, notice=None, archive_changes=None):
+        (source / 'dist').mkdir(parents=True)
+        package = release.PACKAGES['swade']
+        manifest = {'id': package['id'], 'name': package['name'], 'version': '0.1.0',
+                    'sdk': {'requires': '>=1.0.0 <2.0.0'},
+                    'system': {'actorTypes': []}, 'entry': 'main.js',
+                    'django': {'apps': ['gravewright_swade.apps.SwadeConfig'],
+                               'replaces': ['gravewright.savage-worlds.rules']}}
+        release.write(source / 'manifest.json', manifest)
+        filename = package['archive_prefix'] + '-0.1.0.zip'
+        with zipfile.ZipFile(source / 'dist' / filename, 'w') as archive:
+            archive.writestr('manifest.json', json.dumps({**manifest, **(archive_changes or {})}))
+            archive.writestr('main.js', 'export default {};')
+            archive.writestr('assets/branding/savage-worlds-logo.png', b'fixture-logo')
+            archive.writestr('NOTICE.md', release.SAVAGE_NOTICE if notice is None else notice)
+            for name in ('__init__.py', 'apps.py', 'combat.py'):
+                archive.writestr('gravewright_swade/' + name, '# Synthetic package fixture\n')
+            if extra:
+                archive.writestr(extra, 'unexpected')
+
     def repack(self, raw, *, changed=None, extra=None, mode=None):
         output = io.BytesIO()
         with zipfile.ZipFile(io.BytesIO(raw)) as original, zipfile.ZipFile(output, 'w') as destination:
@@ -159,11 +179,11 @@ class ReleaseTests(unittest.TestCase):
                         release.prepare('dnd5e', root / 'source', root / 'release', 'a' * 40)
                 self.assertEqual(list((root / 'release').iterdir()), [])
 
-    def test_swade_pair_preserves_public_archives_and_signed_ascii_display_contract(self):
+    def test_unified_swade_preserves_one_public_archive_and_signature_contract(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            self.paired_source(root / 'source', family='swade')
-            for key, kind in [('swade-server', 'django'), ('swade', 'system')]:
+            self.unified_swade_source(root / 'source')
+            for key, kind in [('swade', 'system')]:
                 with self.subTest(package=key):
                     package = release.PACKAGES[key]
                     filename = package['archive_prefix'] + '-0.1.0.zip'
@@ -176,12 +196,16 @@ class ReleaseTests(unittest.TestCase):
                     self.assertEqual(tag, package['id'] + '-v0.1.0')
                     self.assertTrue(record['name'].isascii())
                     self.assertTrue(record['description'].isascii())
-                    self.assertIn('Gravewright VTT 0.2.3+', record['description'])
-                    self.assertIn('context.host and card.asset.upload', record['description'])
+                    self.assertIn('Gravewright VTT 0.2.4+', record['description'])
+                    self.assertIn('One complete SWADE system package', record['description'])
                     self.assertEqual(record['sha256'], hashlib.sha256(public).hexdigest())
                     self.assertNotIn('dependencies', record)
                     with zipfile.ZipFile(archive) as contents:
-                        self.assertEqual(json.loads(contents.read('manifest.json'))['name'], package['name'])
+                        manifest = json.loads(contents.read('manifest.json'))
+                        self.assertEqual(manifest['name'], package['name'])
+                        self.assertIn('system', manifest)
+                        self.assertIn('django', manifest)
+                        self.assertIn('gravewright_swade/apps.py', contents.namelist())
                     signing_key = Ed25519PrivateKey.generate()
                     pem = signing_key.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption())
                     keys = {'test': base64.b64encode(signing_key.public_key().public_bytes_raw()).decode()}
@@ -190,16 +214,28 @@ class ReleaseTests(unittest.TestCase):
                                            sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode('ascii')
                     signing_key.public_key().verify(base64.b64decode(signed['signature']), canonical)
 
-    def test_swade_mismatched_versions_game_content_and_changed_notice_are_rejected(self):
-        cases = [dict(server_version='0.1.1'), dict(extra='book.pdf'), dict(notice='altered notice'),
-                 dict(archive_changes={'swade': {'content': {'compendiums': []}}})]
+    def test_swade_missing_server_game_content_and_changed_notice_are_rejected(self):
+        cases = [dict(extra='book.pdf'), dict(notice='altered notice'),
+                 dict(archive_changes={'content': {'compendiums': []}}),
+                 dict(archive_changes={'django': {'apps': []}})]
         for changes in cases:
             with self.subTest(changes=changes), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
-                self.paired_source(root / 'source', family='swade', **changes)
+                self.unified_swade_source(root / 'source', **changes)
                 with patch.object(release, 'source_release_archive') as public, self.assertRaises(ValueError):
                     release.prepare('swade', root / 'source', root / 'release', 'a' * 40)
                 public.assert_not_called()
+
+    def test_publishing_unified_system_retires_only_absorbed_module_records(self):
+        legacy = {'id': 'gravewright.savage-worlds.rules', 'version': '0.1.0', 'signature': 'unchanged-old'}
+        browser = {'id': 'gravewright.savage-worlds', 'version': '0.1.0', 'signature': 'unchanged-browser'}
+        other = {'id': 'gravewright.5e-srd-server', 'version': '0.1.0', 'signature': 'unchanged-other'}
+        replacement = {'id': 'gravewright.savage-worlds', 'version': '0.1.1', 'signature': 'new'}
+        catalog = [legacy, browser, other]
+        self.assertEqual(release.published_catalog(catalog, 'swade', replacement), [browser, other, replacement])
+        self.assertEqual(catalog, [legacy, browser, other])
+        self.assertEqual(release.published_catalog(catalog, 'dnd5e', other), [*catalog, other])
+        self.assertNotIn('swade-server', release.PACKAGES)
 
     def test_source_release_requires_exact_tag_public_release_and_verified_digest(self):
         for changes in [{'tag_sha': 'b' * 40}, {'draft': True}, {'digest': 'sha256:' + '0' * 64}]:
