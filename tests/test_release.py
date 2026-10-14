@@ -26,35 +26,20 @@ class ReleaseTests(unittest.TestCase):
         with zipfile.ZipFile(directory / 'dice.zip', 'w') as archive:
             archive.writestr('manifest.json', json.dumps(manifest))
 
-    def paired_source(self, source, *, family='dnd5e', server_version='0.1.0',
-                      archive_changes=None, extra=None, notice=None):
-        (source / 'server').mkdir(parents=True, exist_ok=True)
-        (source / 'dist').mkdir(exist_ok=True)
-        for key in (family, family + '-server'):
-            package = release.PACKAGES[key]
-            manifest = {'id': package['id'], 'name': package['name'],
-                        'version': server_version if key.endswith('-server') else '0.1.0',
-                        'sdk': {'requires': '>=1.0.0 <2.0.0'}}
-            if not key.endswith('-server'):
-                manifest.update(system={'actorTypes': []}, entry='main.js')
-                if family == 'dnd5e':
-                    manifest['content'] = {'compendiums': ['compendiums/2014.json']}
-            else:
-                manifest['django'] = {'apps': ['gravewright_5e.apps.Gravewright5eConfig']}
-            release.write(source / package['manifest'], manifest)
-            archived = {**manifest, **((archive_changes or {}).get(key, {}))}
-            with zipfile.ZipFile(source / 'dist' / f"{package['archive_prefix']}-{manifest['version']}.zip", 'w') as archive:
-                archive.writestr('manifest.json', json.dumps(archived))
-                if not key.endswith('-server'):
-                    archive.writestr('main.js', 'export default {};')
-                    if family == 'dnd5e':
-                        archive.writestr('compendiums/2014.json', json.dumps({'packs': [{'id': 'weapons', 'entries': []}]}))
-                    else:
-                        archive.writestr('assets/branding/savage-worlds-logo.png', b'fixture-logo')
-                if family == 'swade':
-                    archive.writestr('NOTICE.md', release.SAVAGE_NOTICE if notice is None else notice)
-                if extra:
-                    archive.writestr(extra, 'unexpected')
+    def system_source(self, source, *, archive_changes=None, extra=None):
+        (source / 'dist').mkdir(parents=True, exist_ok=True)
+        package = release.PACKAGES['dnd5e']
+        manifest = {'id': package['id'], 'name': package['name'], 'version': '0.1.0',
+                    'sdk': {'requires': '>=1.0.0 <2.0.0'}, 'system': {'actorTypes': []},
+                    'entry': 'main.js', 'content': {'compendiums': ['compendiums/2014.json']}}
+        release.write(source / package['manifest'], manifest)
+        archived = {**manifest, **((archive_changes or {}).get('dnd5e', {}))}
+        with zipfile.ZipFile(source / 'dist' / 'gravewright-5e-srd-0.1.0.zip', 'w') as archive:
+            archive.writestr('manifest.json', json.dumps(archived))
+            archive.writestr('main.js', 'export default {};')
+            archive.writestr('compendiums/2014.json', json.dumps({'packs': [{'id': 'weapons', 'entries': []}]}))
+            if extra:
+                archive.writestr(extra, 'unexpected')
 
     def unified_swade_source(self, source, *, extra=None, notice=None, archive_changes=None):
         (source / 'dist').mkdir(parents=True)
@@ -143,11 +128,11 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             release.sign_record(record, pem, 'old', keys)
 
-    def test_paired_artifacts_publish_as_system_and_trusted_django_packages(self):
+    def test_dnd_publishes_as_one_system_with_licensed_compendiums(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            self.paired_source(root / 'source')
-            for key, kind in [('dnd5e', 'system'), ('dnd5e-server', 'django')]:
+            self.system_source(root / 'source')
+            for key, kind in [('dnd5e', 'system')]:
                 destination = root / key
                 filename = release.PACKAGES[key]['archive_prefix'] + '-0.1.0.zip'
                 built = (root / 'source/dist' / filename).read_bytes()
@@ -168,7 +153,7 @@ class ReleaseTests(unittest.TestCase):
                         {'extra': 'surprise.txt'}, {'extra': 'MAIN.JS'}]:
             with self.subTest(changes=changes), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
-                self.paired_source(root / 'source')
+                self.system_source(root / 'source')
                 built = (root / 'source/dist/gravewright-5e-srd-0.1.0.zip').read_bytes()
                 with self.published_source('dnd5e', self.repack(built, **changes)):
                     with self.assertRaises(ValueError):
@@ -231,8 +216,10 @@ class ReleaseTests(unittest.TestCase):
         catalog = [legacy, browser, other]
         self.assertEqual(release.published_catalog(catalog, 'swade', replacement), [browser, other, replacement])
         self.assertEqual(catalog, [legacy, browser, other])
-        self.assertEqual(release.published_catalog(catalog, 'dnd5e', other), [*catalog, other])
+        dnd = {'id': 'gravewright.5e-srd', 'version': '0.1.1', 'signature': 'new-dnd'}
+        self.assertEqual(release.published_catalog(catalog, 'dnd5e', dnd), [legacy, browser, dnd])
         self.assertNotIn('swade-server', release.PACKAGES)
+        self.assertNotIn('dnd5e-server', release.PACKAGES)
 
     def test_source_release_requires_exact_tag_public_release_and_verified_digest(self):
         for changes in [{'tag_sha': 'b' * 40}, {'draft': True}, {'digest': 'sha256:' + '0' * 64}]:
@@ -269,25 +256,38 @@ class ReleaseTests(unittest.TestCase):
             release.download('https://api.github.com/repos/Gravewright/dnd-srd-5e', 64, api=True)
             self.assertEqual(request.call_args.args[0].get_header('Authorization'), 'Bearer temporary-test-token')
 
-    def test_mismatched_paired_versions_are_rejected_before_selection(self):
+    def test_dnd_needs_no_server_manifest_or_server_artifact(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            self.paired_source(root / 'source', server_version='0.1.1')
-            with self.assertRaisesRegex(ValueError, 'versions must match'):
-                release.prepare('dnd5e', root / 'source', root / 'release', 'a' * 40)
+            self.system_source(root / 'source')
+            self.assertFalse((root / 'source/server').exists())
+            built = (root / 'source/dist/gravewright-5e-srd-0.1.0.zip').read_bytes()
+            with self.published_source('dnd5e', built):
+                archive, record, _ = release.prepare('dnd5e', root / 'source', root / 'release', 'a' * 40)
+            self.assertEqual(record['type'], 'system')
+            self.assertEqual(list((root / 'release').iterdir()), [archive])
+
+    def test_dnd_rejects_python_runtime_before_publication(self):
+        for extra in ('rules.py', 'runtime/unsafe.pyc', 'runtime/native.pyd'):
+            with self.subTest(extra=extra), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                self.system_source(root / 'source', extra=extra)
+                with patch.object(release, 'source_release_archive') as public, self.assertRaises(ValueError):
+                    release.prepare('dnd5e', root / 'source', root / 'release', 'a' * 40)
+                public.assert_not_called()
 
     def test_stale_manifest_unsafe_paths_and_duplicate_entries_are_rejected(self):
         for changes, extra in [({'dnd5e': {'description': 'stale archive'}}, None),
                                ({}, '../outside'), ({}, 'MAIN.JS')]:
             with self.subTest(changes=changes, extra=extra), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
-                self.paired_source(root / 'source', archive_changes=changes, extra=extra)
+                self.system_source(root / 'source', archive_changes=changes, extra=extra)
                 with self.assertRaises(ValueError):
                     release.prepare('dnd5e', root / 'source', root / 'release', 'a' * 40)
 
     def test_manifest_cannot_disguise_trusted_server_as_browser_module(self):
         for key, change in [('dnd5e', {'system': None, 'django': {'apps': ['example']}}),
-                            ('dnd5e-server', {'system': {}})]:
+                            ('swade', {'system': {}, 'django': {'apps': ['example']}})]:
             package = release.PACKAGES[key]
             manifest = {'id': package['id'], 'name': package['name'], 'version': '0.1.0', **change}
             with self.subTest(package=key), self.assertRaises(ValueError):

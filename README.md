@@ -23,30 +23,30 @@ GRAVEWRIGHT_MARKETPLACE_KEYS_FILE=/absolute/path/to/marketplace/trusted-keys.jso
 | --- | --- | --- |
 | [Translator](https://github.com/Gravewright/translator) | [v0.1.2](https://github.com/Gravewright/marketplace/releases/tag/gravewright.translator-v0.1.2) | Owner: Installed modules → Activate languages. Users: internal Settings → Interface language. |
 | [Gravewright 3D Dice](https://github.com/Gravewright/Gravewright-3D-Dice) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright-3d-dice-v0.1.1) | Activate per table in Extensions; appearance preferences are personal. |
-| [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) | [v0.1.0 Alpha](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-v0.1.0) | Install under Systems; select when creating a table. Requires VTT 0.2.1+ and the server companion below. |
-| [DnD 5e SRD - Server Rules](https://github.com/Gravewright/dnd-srd-5e/blob/main/server/README.md) | [v0.1.0 Alpha](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-server-v0.1.0) | Host owner: install under Modules and activate the trusted Django extension through the managed Runner. |
+| [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-v0.1.1) | One package under Systems, including compendiums and automation. Works on VTT 0.2.3. |
 | [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright.savage-worlds-v0.1.1) | One package under Systems, including its automation. Works on VTT 0.2.3. |
 
 Translator offers English, Brazilian Portuguese and Spanish. It requires a host with `manifest.locales` support and global language activation. Version 0.1.2 includes reviewed interface catalogs and module integration documentation. See the package README for coverage limits and validation instructions.
 
 ## DnD 5e SRD
 
-[DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) 0.1.0 Alpha supports
-2014 (SRD 5.1) and 2024 (SRD 5.2.1) rule profiles. It requires **Gravewright
-VTT 0.2.1 or later**. Both signed packages are available in the Marketplace.
-Install the browser package from **Systems** and select it when creating a table. Install
-**DnD 5e SRD - Server Rules** with the same version from **Modules**, then activate
-the trusted Django extension as the host owner through the managed Runner. This
-restarts the server and supplies system-owned combat automation. The core has no
-D&D rules. Install and activate Translator 0.1.2 for Portuguese or Spanish UI;
-SRD compendium text remains in English.
+[DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) **0.1.1** includes the
+2014 (SRD 5.1) and 2024 (SRD 5.2.1) profiles in one system package for the
+published **Gravewright VTT 0.2.3**. Install it under **Systems** and select the
+version for your table. Sheets, item templates, licensed SRD compendiums,
+initiative and effect automation belong to this package. The GM advances combat
+through the system tracker. The VTT core and its release remain unchanged.
 
-The browser system and server companion are separate signed packages with IDs
-`gravewright.5e-srd` (`type: "system"`) and `gravewright.5e-srd-server`
-(`type: "django"`). The display name does not change saved table identifiers.
-Installation and activation are separate operations; the catalog does not
-automatically resolve dependencies or enforce a minimum VTT application version.
-See the system repository for licensing, supported automation and limitations.
+The only current package ID is `gravewright.5e-srd` (`type: "system"`). No server
+extension or Python activation is required. Earlier installations can review
+the old companion in the system's Customize window; the host owner authorizes
+deactivation and removal after reviewing affected tables. Existing actors,
+items, table settings and historical release signatures are preserved.
+
+English is the default interface language. Activate the official Translator
+0.1.2 for Portuguese or Spanish; authored SRD compendium text remains in English.
+The catalog describes the application requirement but does not enforce a minimum
+VTT version. See the source repository for licensing and supported automation.
 
 ## Savage Worlds Compatibility Package for Gravewright
 

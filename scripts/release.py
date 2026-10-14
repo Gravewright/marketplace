@@ -24,11 +24,9 @@ PACKAGES = {
                    'tags': ['Tradução', 'Idiomas', 'Interface']},
     'dnd5e': {'id': 'gravewright.5e-srd', 'repo': 'Gravewright/dnd-srd-5e',
               'name': 'DnD 5e SRD', 'type': 'system', 'manifest': 'manifest.json',
-              'archive_prefix': 'gravewright-5e-srd', 'tags': ['D&D', '5e', 'SRD', '2014', '2024']},
-    'dnd5e-server': {'id': 'gravewright.5e-srd-server', 'repo': 'Gravewright/dnd-srd-5e',
-                     'name': 'DnD 5e SRD - Server Rules', 'type': 'django',
-                     'manifest': 'server/manifest.json', 'archive_prefix': 'gravewright-5e-srd-server',
-                     'tags': ['D&D', '5e', 'SRD', 'Automações', 'Servidor']},
+              'archive_prefix': 'gravewright-5e-srd',
+              'retired_catalog_ids': ['gravewright.5e-srd-server'],
+              'tags': ['D&D', '5e', 'SRD', '2014', '2024']},
     'swade': {'id': 'gravewright.savage-worlds',
               'repo': 'Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright',
               'name': 'Savage Worlds Compatibility Package for Gravewright',
@@ -38,7 +36,7 @@ PACKAGES = {
               'catalog_description': 'One complete SWADE system package for Gravewright VTT 0.2.3+: editable sheets, item templates, action decks and package-owned automation through GM turn controls. Install under Systems. No game content or compendiums. English by default; official Translator for Portuguese and Spanish.',
               'tags': ['Savage Worlds', 'SWADE', 'Fichas', 'Automação']},
 }
-PAIRED_PACKAGES = (('dnd5e', 'dnd5e-server'),)
+SYSTEM_PACKAGES = ('dnd5e', 'swade')
 SAVAGE_NOTICE = ('This game references the Savage Worlds game system, available from '
                  'Pinnacle Entertainment Group at www.peginc.com. Savage Worlds and all '
                  'associated logos and trademarks are copyrights of Pinnacle Entertainment '
@@ -146,21 +144,15 @@ def archive_payload(raw):
 
 def prepare(package, source, directory, source_sha):
     """Select the tested system artifact, preserving immutable source ZIP bytes."""
-    pair = ('swade',) if package == 'swade' else next((group for group in PAIRED_PACKAGES if package in group), None)
-    if pair is None:
+    if package not in SYSTEM_PACKAGES:
         raise ValueError('Artifact selection is only needed for system packages.')
     if not re.fullmatch('[0-9a-f]{40}', source_sha):
         raise ValueError('A full source commit SHA is required.')
-    manifests = {key: read(source / PACKAGES[key]['manifest'])
-                 for key in pair}
-    for key, manifest in manifests.items():
-        validate_manifest(PACKAGES[key], manifest)
-    if len(pair) == 2 and manifests[pair[0]]['version'] != manifests[pair[1]]['version']:
-        raise ValueError('Browser and server package versions must match.')
+    expected = read(source / PACKAGES[package]['manifest'])
+    validate_manifest(PACKAGES[package], expected)
     if directory.exists() and any(directory.iterdir()):
         raise ValueError('The artifact destination must be empty.')
     directory.mkdir(parents=True, exist_ok=True)
-    expected = manifests[package]
     filename = f"{PACKAGES[package]['archive_prefix']}-{expected['version']}.zip"
     archive = source / 'dist' / filename
     if archive.stat().st_size > 64 * 1024 * 1024:
@@ -182,6 +174,8 @@ def prepare(package, source, directory, source_sha):
             raise ValueError('Archive manifest differs from the tested source manifest.')
         if PACKAGES[package]['type'] == 'system':
             contents.getinfo(expected['entry'])
+            if any(Path(name).suffix.lower() in {'.py', '.pyc', '.pyo', '.pyd'} for name in names):
+                raise ValueError('Systems must use the released browser APIs without Python runtime files.')
         if package == 'dnd5e':
             paths = expected.get('content', {}).get('compendiums', [])
             if not paths:

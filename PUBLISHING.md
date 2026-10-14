@@ -7,7 +7,7 @@ branch. The temporary `GITHUB_TOKEN` writes only to this repository.
 
 1. Commit and push the source version. Never reuse a published package ID/version.
 2. Dispatch the workflow from `main`, selecting `dice3d`, `translator`, `dnd5e`,
-   `dnd5e-server` or `swade` and the source commit SHA, tag or branch.
+   or `swade` and the source commit SHA, tag or branch.
 3. Review the resolved full source SHA, build tests, artifact and archive SHA-256.
 4. Approve the pending deployment as an authorized environment reviewer.
 5. The workflow signs the approved ZIP, creates a release draft with the archive,
@@ -21,46 +21,42 @@ and commit it. Do not replace a published archive or reuse its version.
 
 ## DnD 5e SRD
 
-Source repository: [Gravewright/dnd-srd-5e](https://github.com/Gravewright/dnd-srd-5e).
-Keep the stable IDs `gravewright.5e-srd` and `gravewright.5e-srd-server`; display
-names are **DnD 5e SRD** and **DnD 5e SRD - Server Rules**. Both manifests must
-declare the same version.
+The source is `Gravewright/dnd-srd-5e`. Preserve the system ID
+`gravewright.5e-srd` and display name **DnD 5e SRD**. Each release contains one
+browser system ZIP with its sheets, item templates, licensed SRD compendiums,
+translations and JavaScript automation. Do not publish another server package.
 
-Publish the source repository's public `v{version}` release and its versioned ZIP
-assets first. Dispatch `dnd5e-server`, then `dnd5e`, using the **same full source
-commit SHA**. Each dispatch tests the source and builds both artifacts. It checks
-that the source Git tag resolves to that exact commit, then downloads the selected
-public release ZIP with its GitHub SHA-256 and size checks. Every ZIP path,
-permission and uncompressed file must match the tested build; extra entries,
-duplicates and changed payloads are rejected. The original published ZIP bytes
-become the sole artifact for approval and signing. This preserves one immutable
-ID/version archive even when zlib and zlib-ng produce different DEFLATE streams.
-The workflow serializes releases to prevent concurrent
-catalog pushes. Publishing the companion first makes its required download
-available before offering the browser system.
+Publish `v{version}` in the source repository with
+`gravewright-5e-srd-{version}.zip` and its checksum. Dispatch **`dnd5e`** once
+with the full source commit SHA. The workflow checks out the unchanged public
+VTT 0.2.3 commit for its SDK and native installer tests. It runs JavaScript,
+translation and compendium checks, builds the ZIP before the installation
+tests, and validates exact runtime files, CRC, SHA-256 and license notices.
+Existing compiled SRD data and provenance remain intact; rebuilding licensed
+source material is a separate operation.
 
-The build tests the system against a pinned VTT 0.2.1 checkout via
-`GRAVEWRIGHT_TEST_HOST_ROOT`. Host dependencies come from its locked environment
-and are not bundled in the system packages. JavaScript rules, translations,
-compiled compendiums and trusted server rules are checked. Rebuilding compendiums
-from the licensed, pinned SRD PDF/YAML sources is a separate source-project task.
-After building, `scripts/validate_package.py` checks generated data, translations,
-compendiums, provenance, exact ZIP contents, CRCs, SHA-256 and licensing notices.
+`scripts/release.py prepare` verifies the source tag and public release,
+download metadata and every payload byte and mode against the tested build.
+The immutable public source ZIP becomes the single artifact approved and signed.
+Systems with Django manifests or Python runtime files are rejected. The signer
+does not execute source-package code and receives only the approved ZIP.
 
-`scripts/release.py prepare` checks paired identities, versions, names and package
-types, requires the public source release, selects its expected versioned archive,
-checks safe ZIP paths and compares its entire payload with the tested build.
-The archive manifest must match the tested source. The browser record is
-`type: "system"`; the server companion is `type: "django"`, requiring explicit
-host-owner activation and a managed Runner restart. The signing job never checks
-out or executes source-package code.
+After publishing and verifying the replacement download, the same catalog commit
+adds the new `type: "system"` record and retires all `gravewright.5e-srd-server`
+entries. Preserve every other historical record, archive URL and signature.
+Do not retire the old entry before the new signed system is available.
+Verify all catalog signatures and install the public ZIP in an isolated original
+VTT 0.2.3 before updating availability links. Never publish a VTT release for
+this system-package update.
 
-Document the **VTT 0.2.1 minimum**, companion of the same version and optional
-Translator 0.1.2 for additional interface languages. Catalog records do not
-support `dependencies` or a minimum host version field; adding unknown fields
-makes the VTT reject the record. SDK `>=1.0.0 <2.0.0` alone cannot express the
-minimum application version. Verify both public ZIPs and signed records, then
-test installation in VTT 0.2.1 before updating availability links.
+The catalog supports only its documented fields. Put the VTT 0.2.3 requirement
+and optional official Translator in the description and documentation; do not
+invent dependency or minimum-host fields. The SDK remains `>=1.0.0 <2.0.0`.
+Existing installations use the system's owner-authorized migration controls to
+deactivate the old companion through the native restart flow; removing it is
+a separate confirmation after reviewing affected tables. New installations
+need only the system ZIP. The GM advances browser-owned combat automation from
+the table; no Python extension is activated.
 
 ## Savage Worlds Compatibility Package for Gravewright
 

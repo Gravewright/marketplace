@@ -22,57 +22,41 @@ nas Releases do Marketplace. Versões anteriores mantêm seus endereços e assin
 
 ## Publicar DnD 5e SRD
 
-O código de origem fica em `Gravewright/dnd-srd-5e`. Preserve os IDs técnicos
-`gravewright.5e-srd` e `gravewright.5e-srd-server` para manter a compatibilidade
-com as mesas existentes. Os nomes exibidos são **DnD 5e SRD** e
-**DnD 5e SRD - Server Rules**. Os dois manifests precisam ter a mesma versão.
+A origem é `Gravewright/dnd-srd-5e`. Preserve o ID `gravewright.5e-srd` e o nome
+**DnD 5e SRD**. Cada versão tem um único ZIP de sistema para o navegador, com
+fichas, modelos de itens, compêndios SRD licenciados, traduções e automações
+JavaScript. Não publique outro pacote de servidor.
 
-Publique primeiro a release pública `v{versão}` no repositório de origem, com
-seus ZIPs versionados. Execute o workflow duas vezes, sequencialmente, com o
-**mesmo SHA completo** da origem: primeiro `dnd5e-server`, depois `dnd5e`.
-Cada execução testa e constrói a origem, confirma que a tag Git da release aponta
-para esse commit e baixa o ZIP público correspondente. O tamanho e o SHA-256
-precisam conferir com os metadados do GitHub. Todos os caminhos, permissões e
-arquivos descompactados precisam ser idênticos ao build testado; entradas extras,
-duplicadas ou adulteradas são rejeitadas. Os bytes originais da release pública
-formam o único ZIP enviado para aprovação e assinatura. Assim, a mesma identidade
-ID/versão preserva seu arquivo imutável mesmo quando zlib e zlib-ng produzem
-compressões DEFLATE diferentes. A concorrência do workflow impede que duas
-publicações disputem a atualização do catálogo. O primeiro registro disponibiliza
-o complemento de servidor antes de oferecer o sistema que depende dele.
+Publique `v{versão}` no repositório de origem com
+`gravewright-5e-srd-{versão}.zip` e seu checksum. Execute **`dnd5e`** uma vez,
+com o SHA completo da origem. O workflow usa o commit público inalterado do
+VTT 0.2.3 nos testes do SDK e da instalação nativa. Verifica JavaScript,
+traduções e compêndios, gera o ZIP antes do teste de instalação e valida
+arquivos exatos, CRC, SHA-256 e avisos de licença. Os compêndios compilados e
+sua proveniência permanecem intactos; reconstruir as fontes licenciadas é uma
+operação separada.
 
-O build usa um checkout fixo do VTT 0.2.1 apenas para testes da API oficial e
-do backend, com `GRAVEWRIGHT_TEST_HOST_ROOT`. As dependências do VTT vêm do
-seu `uv.lock`; não entram nos ZIPs. Os testes JavaScript, catálogos de idiomas e
-regras de servidor são verificados. O build usa os compêndios SRD já gerados e
-validados. Após o build, `scripts/validate_package.py` verifica os dados gerados,
-traduções, compêndios, proveniência, arquivos exatos dos ZIPs, CRC, SHA-256 e
-avisos de licença. Reconstruir os compêndios a partir dos PDFs/YAMLs licenciados é uma
-operação separada no projeto de origem, com suas fontes e hashes fixos.
+`scripts/release.py prepare` confere a tag, a release pública, os metadados do
+download e cada arquivo e permissão contra o build testado. O ZIP público
+imutável forma o único artefato enviado à aprovação e assinatura. Sistemas com
+manifest Django ou fontes Python no runtime são rejeitados. O job de assinatura
+recebe apenas o ZIP aprovado e não executa código do projeto de origem.
 
-`scripts/release.py prepare` confere IDs, nomes, tipos, versões, release pública
-de origem, igualdade entre o manifest da origem e o do ZIP, caminhos seguros,
-presença dos compêndios e todo o conteúdo do arquivo publicado contra o build.
-`dnd5e` gera um registro `type: "system"`; `dnd5e-server`, `type: "django"`.
-Nunca publique o complemento como módulo comum para evitar esconder que ele
-contém código Python confiável. O job de assinatura recebe apenas o ZIP
-aprovado; não faz checkout nem executa código do sistema.
+Após publicar e conferir o download do substituto, o mesmo commit do catálogo
+acrescenta o novo registro `type: "system"` e retira todas as entradas
+`gravewright.5e-srd-server`. Preserve os demais registros históricos, URLs e
+assinaturas. Não retire o registro antigo antes de o sistema assinado estar
+disponível. Confira todas as assinaturas e instale o ZIP público no VTT 0.2.3
+original e isolado antes de atualizar os links. Não publique uma release do VTT
+para esta alteração no pacote do sistema.
 
-O catálogo atual aceita somente os campos documentados no README. Requisitos
-como **VTT 0.2.1**, a instalação do complemento na mesma versão e Translator
-para idiomas adicionais devem estar na descrição e na documentação: não
-acrescente campos `dependencies` ou `minimumHost`, pois o host os rejeita.
-O SDK continua `>=1.0.0 <2.0.0`; esse intervalo não substitui o requisito de VTT.
-
-Depois de ambas as publicações, confirme as assinaturas, baixe os ZIPs públicos
-e teste sua instalação no VTT 0.2.1. Só então atualize os links de disponibilidade
-da documentação. Pacotes, registros e assinaturas já publicados são imutáveis.
-
-O ambiente aceita somente a branch `main`. A chave privada fica no Secret de
-ambiente `SIGNING_PRIVATE_KEY`; seu identificador fica na variável de ambiente
-`SIGNING_KEY_ID`. A etapa de assinatura usa o segredo em memória e não executa
-código do pacote de origem. O `GITHUB_TOKEN` temporário escreve somente neste
-repositório; não é necessário salvar um PAT para acessar outros repositórios.
+O catálogo aceita somente os campos documentados. Descreva o requisito de VTT
+0.2.3 e o Translator oficial opcional; não invente campos de dependência ou
+versão mínima. O SDK continua `>=1.0.0 <2.0.0`. Instalações antigas usam os
+controles do sistema para autorizar a desativação do complemento pelo reinício
+nativo; remover o arquivo exige outra confirmação após conferir as mesas
+afetadas. Uma instalação nova precisa somente do ZIP do sistema. O mestre
+conduz as automações de combate na mesa, sem ativar extensão Python.
 
 ## Publicar Savage Worlds Compatibility Package for Gravewright
 

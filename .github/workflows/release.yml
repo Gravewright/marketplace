@@ -6,7 +6,7 @@ on:
         description: Package to build
         required: true
         type: choice
-        options: [dice3d, translator, dnd5e, dnd5e-server, swade]
+        options: [dice3d, translator, dnd5e, swade]
       ref:
         description: Source commit SHA, tag or branch (resolved before approval)
         required: true
@@ -49,7 +49,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Gravewright/gravewright
-          ref: b8486abe68c13a042315fcaf7800b51c53a55dec # v0.2.1
+          ref: db15638f65e8f9e02e28b6b7616274006a92c436 # Original v0.2.3
           path: host-vtt
           persist-credentials: false
       - if: startsWith(inputs.package, 'swade')
@@ -71,7 +71,7 @@ jobs:
           python-version: '3.14'
           enable-cache: true
       - if: startsWith(inputs.package, 'dnd5e')
-        name: Validate system, translations, compendiums and server rules
+        name: Validate system, translations, compendiums and native host compatibility
         working-directory: source
         env:
           GRAVEWRIGHT_TEST_HOST_ROOT: ${{ github.workspace }}/host-vtt
@@ -79,8 +79,9 @@ jobs:
           uv sync --project ../host-vtt --locked --no-dev
           npm test
           python scripts/validate_locales.py
-          ../host-vtt/.venv/bin/python -X utf8 server/run_tests.py
+          python -m unittest discover -s tests -p 'test_package.py'
           python scripts/build.py
+          ../host-vtt/.venv/bin/python -B -X utf8 tests/run_host_tests.py
           python scripts/validate_package.py
       - if: startsWith(inputs.package, 'swade')
         name: Validate blank sheets, translations, action decks and native host compatibility
