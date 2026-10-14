@@ -54,15 +54,16 @@ licenças, automações disponíveis e limitações.
 [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright)
 0.1.1 oferece fichas SWADE editáveis, estruturas vazias de itens, iniciativa com
 cartas nativas e automações pertencentes ao pacote. Não inclui conteúdo de jogo
-ou compêndios. Exige **Gravewright VTT 0.2.4 ou posterior**, que reúne interface e
-código de servidor em um único pacote de sistema. Atualize o VTT antes de instalar.
+ou compêndios. Funciona na versão publicada **Gravewright VTT 0.2.3**, com as APIs
+públicas existentes, sem exigir uma nova release do VTT.
 
 Instale o único pacote `gravewright.savage-worlds` (`type: "system"`) em
-**Sistemas**, ative suas automações ali como proprietário e selecione-o na mesa.
-O Runner verifica o código de servidor incluído e reinicia. Fichas, imagens e todas
-as regras Savage Worlds permanecem dentro desse sistema. A ativação da 0.1.1
-substitui a extensão antiga e preserva os dados das mesas. Ela sai da lista normal
-de Módulos, e seu arquivo é mantido para rollback. Instalações novas usam um ZIP.
+**Sistemas** e selecione-o na mesa. Fichas, imagens e regras Savage Worlds ficam
+nesse sistema JavaScript. O mestre avança os turnos e os relógios pelo tracker.
+Operações persistidas retomam atualizações interrompidas sem repetir etapas já
+concluídas. Instalações novas usam somente esse ZIP. Se a extensão antiga ainda
+estiver ativa, use a migração no próprio sistema para desativá-la e removê-la,
+preservando personagens, itens e configurações da mesa.
 
 O idioma padrão é inglês. Ative o Translator oficial 0.1.2 para português do
 Brasil ou espanhol e escolha seu idioma nas configurações da conta. Em

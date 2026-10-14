@@ -34,9 +34,8 @@ PACKAGES = {
               'name': 'Savage Worlds Compatibility Package for Gravewright',
               'type': 'system', 'manifest': 'manifest.json',
               'archive_prefix': 'gravewright-savage-worlds',
-              'bundled_server': True,
               'retired_catalog_ids': ['gravewright.savage-worlds.rules'],
-              'catalog_description': 'One complete SWADE system package: editable sheets, item templates, action decks and server automation. Install and enable automation under Systems on Gravewright VTT 0.2.4+. No separate Server Rules module, game content or compendiums. English by default; official Translator for Portuguese and Spanish.',
+              'catalog_description': 'One complete SWADE system package for Gravewright VTT 0.2.3+: editable sheets, item templates, action decks and package-owned automation through GM turn controls. Install under Systems. No game content or compendiums. English by default; official Translator for Portuguese and Spanish.',
               'tags': ['Savage Worlds', 'SWADE', 'Fichas', 'Automação']},
 }
 PAIRED_PACKAGES = (('dnd5e', 'dnd5e-server'),)
@@ -60,8 +59,8 @@ def validate_manifest(package, manifest):
             or not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', manifest.get('version', ''))):
         raise ValueError('Unexpected module ID or invalid stable version.')
     kind = 'system' if 'system' in manifest else 'django' if 'django' in manifest else 'module'
-    if kind == 'system' and 'django' in manifest and not package.get('bundled_server'):
-        raise ValueError('This package is not approved to bundle server automation.')
+    if kind == 'system' and 'django' in manifest:
+        raise ValueError('The published host requires browser systems without Django server apps.')
     if kind != package.get('type', 'module'):
         raise ValueError('Manifest kind does not match the approved package type.')
     if package.get('name') and manifest.get('name') != package['name']:
@@ -197,12 +196,8 @@ def prepare(package, source, directory, source_sha):
             if SAVAGE_NOTICE not in contents.read('NOTICE.md').decode('utf-8'):
                 raise ValueError('The exact Savage Worlds permission notice is required.')
             contents.getinfo('assets/branding/savage-worlds-logo.png')
-            if expected.get('django') != {'apps': ['gravewright_swade.apps.SwadeConfig'],
-                                          'replaces': ['gravewright.savage-worlds.rules']}:
-                raise ValueError('The system must contain its own server automation.')
-            contents.getinfo('gravewright_swade/__init__.py')
-            contents.getinfo('gravewright_swade/apps.py')
-            contents.getinfo('gravewright_swade/combat.py')
+            if 'django' in expected or any(Path(name).suffix.lower() in {'.py', '.pyc', '.pyo', '.pyd'} for name in names):
+                raise ValueError('The system must use the published host browser APIs without Python runtime files.')
     published = source_release_archive(package, expected['version'], filename, source_sha)
     if archive_payload(published) != archive_payload(archive.read_bytes()):
         raise ValueError('Published source release payload differs from the tested build.')

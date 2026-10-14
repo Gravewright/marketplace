@@ -78,26 +78,28 @@ repositório; não é necessário salvar um PAT para acessar outros repositório
 
 O código está em [Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright).
 Publique somente `gravewright.savage-worlds` (`system`). Seu único manifest reúne
-interface, definição do sistema e automações `django`. Publique primeiro a release
+interface, definição do sistema e automações JavaScript. Publique primeiro a release
 de origem `v{versão}`, com um ZIP e seu checksum. Execute **`swade`** com o SHA
 completo da origem. O workflow verifica tag, SHA-256 público e todo o conteúdo do
 pacote testado antes da aprovação e assinatura. O código do pacote não é executado
 com acesso à chave privada.
 
 O arquivo `gravewright-savage-worlds-{versão}.zip` inclui imagens, interface,
-traduções e o código de servidor `gravewright_swade/`. Preserve o aviso exato da
+traduções e todas as automações. Não inclua fontes Python no runtime. Preserve o aviso exato da
 Pinnacle e o logo aprovado. Não inclua compêndios, conteúdo de jogo ou PDFs.
 O workflow retira a entrada do complemento antigo ao publicar o registro assinado
 do sistema unificado no catálogo. Arquivos e assinaturas históricos permanecem
 inalterados; o workflow não oferece mais o build de servidor separado.
 
-Exige **VTT 0.2.4 ou posterior**, com suporte genérico a sistemas completos e APIs
-`context.host` e `card.asset.upload`. O workflow usa a tag pública `v0.2.4` e verifica esses
+Usa o **VTT 0.2.3 publicado**, sem modificar o host, com APIs existentes como
+`context.host` e `card.asset.upload`. O workflow usa a tag pública `v0.2.3` e verifica esses
 contratos antes do build. O catálogo não impõe versão mínima da aplicação; hosts
 anteriores precisam atualizar o core. Confira os hashes dos ZIPs públicos antes de
 executar o workflow. O idioma padrão é inglês. Para português ou espanhol, instale e
-ative o Translator oficial 0.1.2. O proprietário ativa as automações no próprio
-sistema instalado em **Sistemas**, com reinício pelo Runner.
+ative o Translator oficial 0.1.2. Instale em **Sistemas** e selecione na mesa.
+O mestre usa o tracker para os turnos e relógios, com retomada persistente de
+operações. Instalações com a extensão antiga usam a migração no próprio sistema;
+instalações novas usam somente o ZIP do sistema.
 
 ## Responsáveis e recuperação
 

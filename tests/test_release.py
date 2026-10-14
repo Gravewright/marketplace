@@ -61,9 +61,7 @@ class ReleaseTests(unittest.TestCase):
         package = release.PACKAGES['swade']
         manifest = {'id': package['id'], 'name': package['name'], 'version': '0.1.0',
                     'sdk': {'requires': '>=1.0.0 <2.0.0'},
-                    'system': {'actorTypes': []}, 'entry': 'main.js',
-                    'django': {'apps': ['gravewright_swade.apps.SwadeConfig'],
-                               'replaces': ['gravewright.savage-worlds.rules']}}
+                    'system': {'actorTypes': []}, 'entry': 'main.js'}
         release.write(source / 'manifest.json', manifest)
         filename = package['archive_prefix'] + '-0.1.0.zip'
         with zipfile.ZipFile(source / 'dist' / filename, 'w') as archive:
@@ -71,8 +69,6 @@ class ReleaseTests(unittest.TestCase):
             archive.writestr('main.js', 'export default {};')
             archive.writestr('assets/branding/savage-worlds-logo.png', b'fixture-logo')
             archive.writestr('NOTICE.md', release.SAVAGE_NOTICE if notice is None else notice)
-            for name in ('__init__.py', 'apps.py', 'combat.py'):
-                archive.writestr('gravewright_swade/' + name, '# Synthetic package fixture\n')
             if extra:
                 archive.writestr(extra, 'unexpected')
 
@@ -196,7 +192,7 @@ class ReleaseTests(unittest.TestCase):
                     self.assertEqual(tag, package['id'] + '-v0.1.0')
                     self.assertTrue(record['name'].isascii())
                     self.assertTrue(record['description'].isascii())
-                    self.assertIn('Gravewright VTT 0.2.4+', record['description'])
+                    self.assertIn('Gravewright VTT 0.2.3+', record['description'])
                     self.assertIn('One complete SWADE system package', record['description'])
                     self.assertEqual(record['sha256'], hashlib.sha256(public).hexdigest())
                     self.assertNotIn('dependencies', record)
@@ -204,8 +200,8 @@ class ReleaseTests(unittest.TestCase):
                         manifest = json.loads(contents.read('manifest.json'))
                         self.assertEqual(manifest['name'], package['name'])
                         self.assertIn('system', manifest)
-                        self.assertIn('django', manifest)
-                        self.assertIn('gravewright_swade/apps.py', contents.namelist())
+                        self.assertNotIn('django', manifest)
+                        self.assertFalse(any(name.endswith('.py') for name in contents.namelist()))
                     signing_key = Ed25519PrivateKey.generate()
                     pem = signing_key.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption())
                     keys = {'test': base64.b64encode(signing_key.public_key().public_bytes_raw()).decode()}
@@ -214,10 +210,11 @@ class ReleaseTests(unittest.TestCase):
                                            sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode('ascii')
                     signing_key.public_key().verify(base64.b64decode(signed['signature']), canonical)
 
-    def test_swade_missing_server_game_content_and_changed_notice_are_rejected(self):
+    def test_swade_server_files_game_content_and_changed_notice_are_rejected(self):
         cases = [dict(extra='book.pdf'), dict(notice='altered notice'),
                  dict(archive_changes={'content': {'compendiums': []}}),
-                 dict(archive_changes={'django': {'apps': []}})]
+                 dict(archive_changes={'django': {'apps': ['unexpected.apps.Config']}}),
+                 dict(extra='unexpected/server.py')]
         for changes in cases:
             with self.subTest(changes=changes), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)

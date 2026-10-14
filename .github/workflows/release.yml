@@ -56,7 +56,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Gravewright/gravewright
-          ref: v0.2.4
+          ref: v0.2.3
           path: host-vtt
           persist-credentials: false
       - if: startsWith(inputs.package, 'swade')
@@ -83,7 +83,7 @@ jobs:
           python scripts/build.py
           python scripts/validate_package.py
       - if: startsWith(inputs.package, 'swade')
-        name: Validate blank sheets, translations, action decks and server rules
+        name: Validate blank sheets, translations, action decks and native host compatibility
         working-directory: source
         env:
           GRAVEWRIGHT_TEST_HOST_ROOT: ${{ github.workspace }}/host-vtt
@@ -92,8 +92,7 @@ jobs:
           npm test
           node --test scripts/cards/test_decks.mjs
           python -m unittest discover -s tests -p 'test_package.py'
-          python -m unittest discover -s server/tests -p 'test_clock*.py'
-          ../host-vtt/.venv/bin/python -X utf8 server/tests/run_django_tests.py
+          ../host-vtt/.venv/bin/python -B -X utf8 tests/run_host_tests.py
           python scripts/build.py
           python scripts/validate_package.py
       - if: inputs.package == 'dice3d'

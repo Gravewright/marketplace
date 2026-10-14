@@ -66,27 +66,30 @@ test installation in VTT 0.2.1 before updating availability links.
 
 Source repository: [Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright).
 Publish only `gravewright.savage-worlds` (`system`). Its one manifest contains
-browser entry, system metadata and `django` server automation. Publish the source
+browser entry, system metadata and JavaScript automation. Publish the source
 `v{version}` release with its single system ZIP and checksum first, then dispatch
 **`swade`** with the full source SHA. The workflow verifies the immutable public
 source archive, its SHA-256 and every tested payload byte before approval and
 signing. Package code never runs with the signing key available.
 
 The ZIP is `gravewright-savage-worlds-{version}.zip`, including browser assets,
-translations and `gravewright_swade/` server code. Preserve the exact Pinnacle
+translations and all package-owned automation. Include no Python runtime files.
+Preserve the exact Pinnacle
 permission notice and approved logo. Include no compendiums, game content or book
 PDFs. Publication retires the old server-only catalog entry atomically when the
 verified replacement record is appended. Historical assets and signatures remain
 unchanged; the workflow no longer offers a separate server-package build.
 
-This release requires **VTT 0.2.4 or later**, including generic support for combined
-system packages, `context.host` and `card.asset.upload`. The workflow tests against
-the public `v0.2.4` host tag. The catalog
+This release targets the original published **VTT 0.2.3** and its existing public
+APIs, including `context.host` and `card.asset.upload`. The workflow tests against
+the public `v0.2.3` host tag without modifying its source. The catalog
 cannot enforce a minimum application version; older hosts must update their core.
 Check the public archive hashes before dispatching. Install and activate the official
 Translator 0.1.2 for Portuguese or Spanish; English is the default. Installing
-the system is followed by host-owner activation of its automation in **Systems**
-and a managed Runner restart.
+the system and selecting it for the table enables its package-owned interface.
+Turn advancement and clock updates use the GM's tracker and persisted retry
+journals. Existing server-only installations use the system's migration controls
+to remove the legacy extension; fresh installations need no server extension.
 
 ## Signing keys and recovery
 
