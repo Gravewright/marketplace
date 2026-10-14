@@ -47,6 +47,29 @@ Installation and activation are separate operations; the catalog does not
 automatically resolve dependencies or enforce a minimum VTT application version.
 See the system repository for licensing, supported automation and limitations.
 
+## Savage Worlds Compatibility Package for Gravewright
+
+[Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright)
+0.1.0 provides editable SWADE sheets, blank item structures, native action-card
+initiative and package-owned automation. It includes no game content or compendiums.
+It requires **Gravewright VTT 0.2.3 or later**, which supplies the generic
+`context.host` and `card.asset.upload` APIs. Update older hosts before installing.
+
+The browser package uses `gravewright.savage-worlds` (`type: "system"`), installed
+under **Systems** and selected when creating a table. Its companion
+`gravewright.savage-worlds.rules` (`type: "django"`) must have the same version;
+the host owner installs it under **Modules** and activates the trusted extension
+through the managed Runner. The core supplies generic APIs; Savage Worlds rules
+remain in these packages.
+
+English is the default interface language. Activate the official Translator
+0.1.2 for Brazilian Portuguese or Spanish and choose a personal language in account
+settings. In the table's **Extensions → Personalize**, choose one of three original
+action-card decks and create it in the native deck manager, or select an existing
+deck. Cards come from the configured deck. Publication uses the signed two-package
+[release workflow](PUBLISHING.md#savage-worlds-compatibility-package-for-gravewright);
+the source repository documents installation, permissions and supported automation.
+
 Use **Update** in installed module lists to install a newer signed release while preserving activation and saved settings. **Remove** lists affected tables for confirmation, then removes the package from those tables. Previously published package archives and signatures remain unchanged.
 
 ## Catalog format

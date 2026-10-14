@@ -29,7 +29,30 @@ PACKAGES = {
                      'name': 'DnD 5e SRD - Server Rules', 'type': 'django',
                      'manifest': 'server/manifest.json', 'archive_prefix': 'gravewright-5e-srd-server',
                      'tags': ['D&D', '5e', 'SRD', 'Automações', 'Servidor']},
+    'swade': {'id': 'gravewright.savage-worlds',
+              'repo': 'Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright',
+              'name': 'Savage Worlds Compatibility Package for Gravewright',
+              'type': 'system', 'manifest': 'manifest.json',
+              'archive_prefix': 'gravewright-savage-worlds',
+              'catalog_description': 'Original editable SWADE sheets, item templates and package-owned automation, without game content or compendiums. Requires the matching server companion and Gravewright VTT 0.2.3+ with context.host and card.asset.upload support. English by default; optional official Translator for Portuguese and Spanish.',
+              'tags': ['Savage Worlds', 'SWADE', 'Fichas', 'Automação']},
+    'swade-server': {'id': 'gravewright.savage-worlds.rules',
+                     'repo': 'Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright',
+                     'name': 'Savage Worlds Compatibility Package for Gravewright — Server Rules',
+                     # The host's signed catalog contract permits ASCII display fields.
+                     # The package manifest retains the approved public display name.
+                     'catalog_name': 'Savage Worlds Compatibility Package for Gravewright - Server Rules',
+                     'type': 'django', 'manifest': 'server/manifest.json',
+                     'archive_prefix': 'gravewright-savage-worlds-rules',
+                     'catalog_description': 'Trusted server companion for configured Savage Worlds effect, power and turn clocks. Requires the browser package of the same version and Gravewright VTT 0.2.3+ with context.host and card.asset.upload support. Activate as host owner through the managed Runner. Contains no catalogs or game content.',
+                     'tags': ['Savage Worlds', 'SWADE', 'Automação', 'Servidor']},
 }
+PAIRED_PACKAGES = (('dnd5e', 'dnd5e-server'), ('swade', 'swade-server'))
+SAVAGE_NOTICE = ('This game references the Savage Worlds game system, available from '
+                 'Pinnacle Entertainment Group at www.peginc.com. Savage Worlds and all '
+                 'associated logos and trademarks are copyrights of Pinnacle Entertainment '
+                 'Group. Used with permission. Pinnacle makes no representation or warranty '
+                 'as to the quality, viability, or suitability for purpose of this product.')
 
 
 def read(path):
@@ -52,7 +75,7 @@ def validate_manifest(package, manifest):
     if package.get('name') and manifest.get('name') != package['name']:
         raise ValueError('Unexpected package display name.')
     for field in ('name', 'description'):
-        value = manifest.get(field, manifest.get('name', ''))
+        value = package.get('catalog_' + field, manifest.get(field, manifest.get('name', '')))
         if not isinstance(value, str) or not value or not value.isascii():
             raise ValueError('Signed display fields must be nonempty ASCII strings.')
 
@@ -131,16 +154,17 @@ def archive_payload(raw):
 
 
 def prepare(package, source, directory, source_sha):
-    """Select one tested 5e artifact, preserving the one-ZIP signing boundary."""
-    if package not in {'dnd5e', 'dnd5e-server'}:
-        raise ValueError('Artifact selection is only needed for the paired 5e packages.')
+    """Select one tested paired artifact, preserving the one-ZIP signing boundary."""
+    pair = next((group for group in PAIRED_PACKAGES if package in group), None)
+    if pair is None:
+        raise ValueError('Artifact selection is only needed for paired system packages.')
     if not re.fullmatch('[0-9a-f]{40}', source_sha):
         raise ValueError('A full source commit SHA is required.')
     manifests = {key: read(source / PACKAGES[key]['manifest'])
-                 for key in ('dnd5e', 'dnd5e-server')}
+                 for key in pair}
     for key, manifest in manifests.items():
         validate_manifest(PACKAGES[key], manifest)
-    if manifests['dnd5e']['version'] != manifests['dnd5e-server']['version']:
+    if manifests[pair[0]]['version'] != manifests[pair[1]]['version']:
         raise ValueError('Browser and server package versions must match.')
     if directory.exists() and any(directory.iterdir()):
         raise ValueError('The artifact destination must be empty.')
@@ -165,8 +189,9 @@ def prepare(package, source, directory, source_sha):
             names.add(name.casefold())
         if contents.testzip() is not None or json.loads(contents.read('manifest.json')) != expected:
             raise ValueError('Archive manifest differs from the tested source manifest.')
-        if package == 'dnd5e':
+        if PACKAGES[package]['type'] == 'system':
             contents.getinfo(expected['entry'])
+        if package == 'dnd5e':
             paths = expected.get('content', {}).get('compendiums', [])
             if not paths:
                 raise ValueError('The SRD system must declare its compiled compendiums.')
@@ -174,6 +199,13 @@ def prepare(package, source, directory, source_sha):
                 collection = json.loads(contents.read(path))
                 if not isinstance(collection.get('packs'), list) or not collection['packs']:
                     raise ValueError('Invalid compiled compendium collection.')
+        if package in {'swade', 'swade-server'}:
+            if 'content' in expected or any(name.lower().endswith('.pdf') for name in names):
+                raise ValueError('Savage Worlds compatibility packages cannot ship game content or PDFs.')
+            if SAVAGE_NOTICE not in contents.read('NOTICE.md').decode('utf-8'):
+                raise ValueError('The exact Savage Worlds permission notice is required.')
+            if package == 'swade':
+                contents.getinfo('assets/branding/savage-worlds-logo.png')
     published = source_release_archive(package, expected['version'], filename, source_sha)
     if archive_payload(published) != archive_payload(archive.read_bytes()):
         raise ValueError('Published source release payload differs from the tested build.')
@@ -201,8 +233,8 @@ def describe(package, directory, source_sha):
         raise ValueError('Invalid archive name.')
     tag = package['id'] + '-v' + manifest['version']
     return archive, {
-        'id': package['id'], 'name': manifest['name'], 'version': manifest['version'],
-        'description': manifest.get('description', manifest['name']),
+        'id': package['id'], 'name': package.get('catalog_name', manifest['name']), 'version': manifest['version'],
+        'description': package.get('catalog_description', manifest.get('description', manifest['name'])),
         'sdk': manifest['sdk']['requires'], 'type': package.get('type', 'module'), 'tags': package['tags'],
         'download': f'https://github.com/Gravewright/marketplace/releases/download/{tag}/{archive.name}',
         'sha256': hashlib.sha256(archive.read_bytes()).hexdigest(),

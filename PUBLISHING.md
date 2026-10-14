@@ -6,8 +6,8 @@ through the `release-signing` environment, restricted to the Marketplace `main`
 branch. The temporary `GITHUB_TOKEN` writes only to this repository.
 
 1. Commit and push the source version. Never reuse a published package ID/version.
-2. Dispatch the workflow from `main`, selecting `dice3d`, `translator`, `dnd5e`
-   or `dnd5e-server` and the source commit SHA, tag or branch.
+2. Dispatch the workflow from `main`, selecting `dice3d`, `translator`, `dnd5e`,
+   `dnd5e-server`, `swade` or `swade-server` and the source commit SHA, tag or branch.
 3. Review the resolved full source SHA, build tests, artifact and archive SHA-256.
 4. Approve the pending deployment as an authorized environment reviewer.
 5. The workflow signs the approved ZIP, creates a release draft with the archive,
@@ -61,6 +61,31 @@ support `dependencies` or a minimum host version field; adding unknown fields
 makes the VTT reject the record. SDK `>=1.0.0 <2.0.0` alone cannot express the
 minimum application version. Verify both public ZIPs and signed records, then
 test installation in VTT 0.2.1 before updating availability links.
+
+## Savage Worlds Compatibility Package for Gravewright
+
+Source repository: [Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright).
+Keep `gravewright.savage-worlds` (`system`) and `gravewright.savage-worlds.rules`
+(`django`), with matching versions. Publish the source `v{version}` release and
+both versioned ZIP assets first, then dispatch **`swade-server` before `swade`**
+with the same full source SHA. The workflow uses the same immutable source-release
+selection, public SHA-256 verification, payload comparison, approval and signing
+boundary as DnD. It never executes package code with the signing key available.
+
+The browser ZIP is `gravewright-savage-worlds-{version}.zip`; the companion is
+`gravewright-savage-worlds-rules-{version}.zip`. Both must retain the exact Pinnacle
+permission notice. The browser also contains the approved logo. No compendiums,
+game content or book PDFs are included. The manifest's approved server name uses
+an em dash; its catalog display uses an ASCII hyphen for the host's signed-record
+contract. This does not change any package ID, manifest or archive.
+
+This release requires **VTT 0.2.3 or later**, which includes the generic
+`context.host` and `card.asset.upload` APIs. The workflow tests against the public
+`v0.2.3` host tag and verifies both capabilities before building. The catalog
+cannot enforce a minimum application version; older hosts must update their core.
+Check the public archive hashes before dispatching. Install and activate the official
+Translator 0.1.2 for Portuguese or Spanish; English is the default. Installing
+the trusted server ZIP requires a separate host-owner activation and Runner restart.
 
 ## Signing keys and recovery
 

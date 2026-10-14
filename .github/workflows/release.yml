@@ -6,7 +6,7 @@ on:
         description: Package to build
         required: true
         type: choice
-        options: [dice3d, translator, dnd5e, dnd5e-server]
+        options: [dice3d, translator, dnd5e, dnd5e-server, swade, swade-server]
       ref:
         description: Source commit SHA, tag or branch (resolved before approval)
         required: true
@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ${{ inputs.package == 'dice3d' && 'Gravewright/Gravewright-3D-Dice' || inputs.package == 'translator' && 'Gravewright/translator' || 'Gravewright/dnd-srd-5e' }}
+          repository: ${{ inputs.package == 'dice3d' && 'Gravewright/Gravewright-3D-Dice' || inputs.package == 'translator' && 'Gravewright/translator' || startsWith(inputs.package, 'swade') && 'Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright' || 'Gravewright/dnd-srd-5e' }}
           ref: ${{ inputs.ref }}
           path: source
           persist-credentials: false
@@ -52,7 +52,19 @@ jobs:
           ref: b8486abe68c13a042315fcaf7800b51c53a55dec # v0.2.1
           path: host-vtt
           persist-credentials: false
-      - if: startsWith(inputs.package, 'dnd5e')
+      - if: startsWith(inputs.package, 'swade')
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Gravewright/gravewright
+          ref: v0.2.3
+          path: host-vtt
+          persist-credentials: false
+      - if: startsWith(inputs.package, 'swade')
+        name: Require the public generic host capabilities before building
+        run: |
+          echo "SWADE test host: $(git -C host-vtt rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          python -c "import json; from pathlib import Path; root=Path('host-vtt/gravewright/modules/contracts'); registry=json.loads((root/'registry.json').read_text()); api=json.loads((root/'api.json').read_text()); assert 'card.asset.upload' in registry['operations'], 'Update the public host: card.asset.upload is required'; assert 'host' in api['context'], 'Update the public host: context.host is required'"
+      - if: startsWith(inputs.package, 'dnd5e') || startsWith(inputs.package, 'swade')
         uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
         with:
           version: '0.12.13'
@@ -70,6 +82,21 @@ jobs:
           ../host-vtt/.venv/bin/python -X utf8 server/run_tests.py
           python scripts/build.py
           python scripts/validate_package.py
+      - if: startsWith(inputs.package, 'swade')
+        name: Validate blank sheets, translations, action decks and server rules
+        working-directory: source
+        env:
+          GRAVEWRIGHT_TEST_HOST_ROOT: ${{ github.workspace }}/host-vtt
+        run: |
+          uv sync --project ../host-vtt --locked --no-dev
+          npm test
+          node --test scripts/cards/test_decks.mjs
+          python -m unittest discover -s tests -p 'test_package.py'
+          python -m unittest discover -s server/tests -p 'test_clock*.py'
+          ../host-vtt/.venv/bin/python -X utf8 server/tests/run_django_tests.py
+          python scripts/build.py
+          python scripts/build_server.py
+          python scripts/validate_package.py
       - if: inputs.package == 'dice3d'
         working-directory: source
         run: |
@@ -81,14 +108,14 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_build.py
           python -c "from django.conf import settings; settings.configure(INSTALLED_APPS=['gravewright_translator'], SECRET_KEY='release-build'); import django; django.setup(); from django.core.management import call_command; call_command('build_translator', output='dist')"
-      - if: startsWith(inputs.package, 'dnd5e')
+      - if: startsWith(inputs.package, 'dnd5e') || startsWith(inputs.package, 'swade')
         name: Verify and select the immutable public source release archive
         run: python scripts/release.py prepare --package "$PACKAGE" --source-sha "$SOURCE_SHA"
         env:
           PACKAGE: ${{ inputs.package }}
           SOURCE_SHA: ${{ steps.source.outputs.sha }}
           GH_TOKEN: ${{ github.token }}
-      - if: ${{ !startsWith(inputs.package, 'dnd5e') }}
+      - if: ${{ !startsWith(inputs.package, 'dnd5e') && !startsWith(inputs.package, 'swade') }}
         run: |
           mkdir release
           cp source/dist/*.zip release/

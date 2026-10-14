@@ -49,6 +49,27 @@ são operações distintas; o catálogo não resolve dependências automaticamen
 nem impõe uma versão mínima da aplicação VTT. Veja no repositório do sistema as
 licenças, automações disponíveis e limitações.
 
+## Savage Worlds Compatibility Package for Gravewright
+
+[Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright)
+0.1.0 oferece fichas SWADE editáveis, estruturas vazias de itens, iniciativa com
+cartas nativas e automações pertencentes ao pacote. Não inclui conteúdo de jogo
+ou compêndios. Exige **Gravewright VTT 0.2.3 ou posterior**, que fornece as APIs
+genéricas `context.host` e `card.asset.upload`. Atualize hosts anteriores antes de instalar.
+
+Instale `gravewright.savage-worlds` (`type: "system"`) em **Sistemas** e selecione-o
+ao criar a mesa. Instale o complemento `gravewright.savage-worlds.rules`
+(`type: "django"`) na mesma versão em **Módulos**. O proprietário do host ativa
+a extensão confiável pelo Runner gerenciado. O core fornece APIs genéricas;
+as regras de Savage Worlds ficam nos dois pacotes.
+
+O idioma padrão é inglês. Ative o Translator oficial 0.1.2 para português do
+Brasil ou espanhol e escolha seu idioma nas configurações da conta. Em
+**Extensões → Personalizar** da mesa, escolha um dos três baralhos de ação
+originais e crie-o no gerenciador nativo, ou selecione um baralho existente.
+As cartas vêm do baralho configurado. Veja o [workflow de publicação assinada](PUBLISHING.pt-BR.md#publicar-savage-worlds-compatibility-package-for-gravewright)
+e o repositório de origem para instalação, permissões e automações disponíveis.
+
 ## Gravewright 3D Dice
 
 Instale [Gravewright 3D Dice v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright-3d-dice-v0.1.1) e ative-o em **Extensões** dentro de cada mesa. Esta versão corrige os avisos de materiais e sombras do Three.js. A aparência dos dados é configurada individualmente.

@@ -26,26 +26,33 @@ class ReleaseTests(unittest.TestCase):
         with zipfile.ZipFile(directory / 'dice.zip', 'w') as archive:
             archive.writestr('manifest.json', json.dumps(manifest))
 
-    def paired_source(self, source, *, server_version='0.1.0', archive_changes=None, extra=None):
+    def paired_source(self, source, *, family='dnd5e', server_version='0.1.0',
+                      archive_changes=None, extra=None, notice=None):
         (source / 'server').mkdir(parents=True, exist_ok=True)
         (source / 'dist').mkdir(exist_ok=True)
-        for key in ('dnd5e', 'dnd5e-server'):
+        for key in (family, family + '-server'):
             package = release.PACKAGES[key]
             manifest = {'id': package['id'], 'name': package['name'],
-                        'version': server_version if key == 'dnd5e-server' else '0.1.0',
+                        'version': server_version if key.endswith('-server') else '0.1.0',
                         'sdk': {'requires': '>=1.0.0 <2.0.0'}}
-            if key == 'dnd5e':
-                manifest.update(system={'actorTypes': []}, entry='main.js',
-                                content={'compendiums': ['compendiums/2014.json']})
+            if not key.endswith('-server'):
+                manifest.update(system={'actorTypes': []}, entry='main.js')
+                if family == 'dnd5e':
+                    manifest['content'] = {'compendiums': ['compendiums/2014.json']}
             else:
                 manifest['django'] = {'apps': ['gravewright_5e.apps.Gravewright5eConfig']}
             release.write(source / package['manifest'], manifest)
             archived = {**manifest, **((archive_changes or {}).get(key, {}))}
             with zipfile.ZipFile(source / 'dist' / f"{package['archive_prefix']}-{manifest['version']}.zip", 'w') as archive:
                 archive.writestr('manifest.json', json.dumps(archived))
-                if key == 'dnd5e':
+                if not key.endswith('-server'):
                     archive.writestr('main.js', 'export default {};')
-                    archive.writestr('compendiums/2014.json', json.dumps({'packs': [{'id': 'weapons', 'entries': []}]}))
+                    if family == 'dnd5e':
+                        archive.writestr('compendiums/2014.json', json.dumps({'packs': [{'id': 'weapons', 'entries': []}]}))
+                    else:
+                        archive.writestr('assets/branding/savage-worlds-logo.png', b'fixture-logo')
+                if family == 'swade':
+                    archive.writestr('NOTICE.md', release.SAVAGE_NOTICE if notice is None else notice)
                 if extra:
                     archive.writestr(extra, 'unexpected')
 
@@ -64,14 +71,15 @@ class ReleaseTests(unittest.TestCase):
     @contextmanager
     def published_source(self, package, raw, *, tag_sha='a' * 40, draft=False, digest=None):
         filename = release.PACKAGES[package]['archive_prefix'] + '-0.1.0.zip'
+        repository = release.PACKAGES[package]['repo']
         record = {'draft': draft, 'tag_name': 'v0.1.0', 'assets': [{
             'name': filename, 'state': 'uploaded', 'size': len(raw),
             'digest': digest or 'sha256:' + hashlib.sha256(raw).hexdigest(),
-            'browser_download_url': 'https://github.com/Gravewright/dnd-srd-5e/releases/download/v0.1.0/' + filename,
+            'browser_download_url': f'https://github.com/{repository}/releases/download/v0.1.0/' + filename,
         }]}
 
         def api(repository, path):
-            self.assertEqual(repository, 'Gravewright/dnd-srd-5e')
+            self.assertEqual(repository, release.PACKAGES[package]['repo'])
             if path == 'git/ref/tags/v0.1.0':
                 return {'object': {'type': 'commit', 'sha': tag_sha}}
             if path == 'releases/tags/v0.1.0':
@@ -150,6 +158,48 @@ class ReleaseTests(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         release.prepare('dnd5e', root / 'source', root / 'release', 'a' * 40)
                 self.assertEqual(list((root / 'release').iterdir()), [])
+
+    def test_swade_pair_preserves_public_archives_and_signed_ascii_display_contract(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self.paired_source(root / 'source', family='swade')
+            for key, kind in [('swade-server', 'django'), ('swade', 'system')]:
+                with self.subTest(package=key):
+                    package = release.PACKAGES[key]
+                    filename = package['archive_prefix'] + '-0.1.0.zip'
+                    public = self.repack((root / 'source/dist' / filename).read_bytes())
+                    with self.published_source(key, public):
+                        archive, record, tag = release.prepare(key, root / 'source', root / key, 'a' * 40)
+                    self.assertEqual(archive.read_bytes(), public)
+                    self.assertEqual(record['type'], kind)
+                    self.assertEqual(record['name'], package.get('catalog_name', package['name']))
+                    self.assertEqual(tag, package['id'] + '-v0.1.0')
+                    self.assertTrue(record['name'].isascii())
+                    self.assertTrue(record['description'].isascii())
+                    self.assertIn('Gravewright VTT 0.2.3+', record['description'])
+                    self.assertIn('context.host and card.asset.upload', record['description'])
+                    self.assertEqual(record['sha256'], hashlib.sha256(public).hexdigest())
+                    self.assertNotIn('dependencies', record)
+                    with zipfile.ZipFile(archive) as contents:
+                        self.assertEqual(json.loads(contents.read('manifest.json'))['name'], package['name'])
+                    signing_key = Ed25519PrivateKey.generate()
+                    pem = signing_key.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption())
+                    keys = {'test': base64.b64encode(signing_key.public_key().public_bytes_raw()).decode()}
+                    signed = release.sign_record(record, pem, 'test', keys)
+                    canonical = json.dumps({k: v for k, v in signed.items() if k != 'signature'},
+                                           sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode('ascii')
+                    signing_key.public_key().verify(base64.b64decode(signed['signature']), canonical)
+
+    def test_swade_mismatched_versions_game_content_and_changed_notice_are_rejected(self):
+        cases = [dict(server_version='0.1.1'), dict(extra='book.pdf'), dict(notice='altered notice'),
+                 dict(archive_changes={'swade': {'content': {'compendiums': []}}})]
+        for changes in cases:
+            with self.subTest(changes=changes), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                self.paired_source(root / 'source', family='swade', **changes)
+                with patch.object(release, 'source_release_archive') as public, self.assertRaises(ValueError):
+                    release.prepare('swade', root / 'source', root / 'release', 'a' * 40)
+                public.assert_not_called()
 
     def test_source_release_requires_exact_tag_public_release_and_verified_digest(self):
         for changes in [{'tag_sha': 'b' * 40}, {'draft': True}, {'digest': 'sha256:' + '0' * 64}]:

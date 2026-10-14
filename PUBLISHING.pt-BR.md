@@ -1,7 +1,7 @@
 # Publicação e chaves de assinatura
 
 O workflow **Sign and publish package** deste repositório gera os pacotes do
-3D Dice, do Translator e do DnD 5e SRD a partir de seus repositórios públicos. Os novos ZIPs,
+3D Dice, do Translator, do DnD 5e SRD e do Savage Worlds a partir de seus repositórios públicos. Os novos ZIPs,
 checksums, registros assinados e a referência ao commit de origem são publicados
 nas Releases do Marketplace. Versões anteriores mantêm seus endereços e assinaturas.
 
@@ -73,6 +73,31 @@ ambiente `SIGNING_PRIVATE_KEY`; seu identificador fica na variável de ambiente
 `SIGNING_KEY_ID`. A etapa de assinatura usa o segredo em memória e não executa
 código do pacote de origem. O `GITHUB_TOKEN` temporário escreve somente neste
 repositório; não é necessário salvar um PAT para acessar outros repositórios.
+
+## Publicar Savage Worlds Compatibility Package for Gravewright
+
+O código está em [Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright).
+Preserve `gravewright.savage-worlds` (`system`) e `gravewright.savage-worlds.rules`
+(`django`), com versões iguais. Publique primeiro a release de origem `v{versão}`
+e os dois ZIPs versionados. Execute **`swade-server` antes de `swade`**, usando
+o mesmo SHA completo da origem nas duas execuções. O workflow usa as mesmas
+verificações de tag, SHA-256 público, conteúdo imutável, aprovação e assinatura
+do DnD. O código do pacote não é executado com acesso à chave privada.
+
+Os arquivos são `gravewright-savage-worlds-{versão}.zip` e
+`gravewright-savage-worlds-rules-{versão}.zip`. Ambos preservam o aviso exato de
+permissão da Pinnacle; o navegador também contém o logo aprovado. Não incluem
+compêndios, conteúdo de jogo ou PDFs do livro. O nome aprovado no manifest do
+servidor mantém o travessão. O catálogo usa um hífen ASCII somente nessa listagem,
+como exige o contrato de registros assinados do host; IDs e ZIPs não são alterados.
+
+Exige **VTT 0.2.3 ou posterior**, que inclui as APIs genéricas `context.host` e
+`card.asset.upload`. O workflow usa a tag pública `v0.2.3` do host e verifica esses
+contratos antes do build. O catálogo não impõe versão mínima da aplicação; hosts
+anteriores precisam atualizar o core. Confira os hashes dos ZIPs públicos antes de
+executar o workflow. O idioma padrão é inglês. Para português ou espanhol, instale e
+ative o Translator oficial 0.1.2. O complemento de servidor requer ativação
+separada pelo proprietário do host e reinício pelo Runner.
 
 ## Responsáveis e recuperação
 
