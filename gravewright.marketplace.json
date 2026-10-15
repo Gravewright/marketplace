@@ -85,25 +85,6 @@
     "signature": "qLDC+YXAUm8LiJ8L7nONOGYiDUDd9462pRjW0/MgxQfT9RXtieakW8tL3FjpvpTNsbvJA7fW0JEresGuxz5WBA=="
   },
   {
-    "id": "gravewright.5e-srd-server",
-    "name": "DnD 5e SRD - Server Rules",
-    "version": "0.1.0",
-    "description": "Server companion for DnD 5e SRD: system-owned initiative, combat resources and turn effects for the 2014/2024 rules. Requires Gravewright VTT 0.2.1 or newer and host-owner activation as trusted Django code.",
-    "sdk": ">=1.0.0 <2.0.0",
-    "type": "django",
-    "tags": [
-      "D&D",
-      "5e",
-      "SRD",
-      "Automa\u00e7\u00f5es",
-      "Servidor"
-    ],
-    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.5e-srd-server-v0.1.0/gravewright-5e-srd-server-0.1.0.zip",
-    "sha256": "c379baedde9dde85237e636773da15e03488f2899b28058127f0d054915acc01",
-    "keyId": "gravewright-2026-10",
-    "signature": "QJHTinw9kmRarEyTP2X5UfJTez6zVcWnTTAHpDw+O5uMcZ+IPjVrTPOoy1+9bYiz0TZzC9s9Sy8us+jU3fdqDQ=="
-  },
-  {
     "id": "gravewright.5e-srd",
     "name": "DnD 5e SRD",
     "version": "0.1.0",
@@ -157,5 +138,24 @@
     "sha256": "b9347707b8f1c05b8f38a78ca10dc94e2b9de0e47abeb82274f7a656b303d272",
     "keyId": "gravewright-2026-10",
     "signature": "4Y8EAdK/t/AG6yJzoqQQmd7Xq/8YobeqqeGW1DGSD9w+KzJGLq6CWMKVvUk3RSERb+puAkenekZRqZURi0bdAg=="
+  },
+  {
+    "id": "gravewright.5e-srd",
+    "name": "DnD 5e SRD",
+    "version": "0.1.1",
+    "description": "DnD 5e SRD for Gravewright VTT 0.2.3: one browser system with character, monster and item sheets, licensed SRD compendiums, selectable 2014/2024 rules and package-owned automation.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "system",
+    "tags": [
+      "D&D",
+      "5e",
+      "SRD",
+      "2014",
+      "2024"
+    ],
+    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.5e-srd-v0.1.1/gravewright-5e-srd-0.1.1.zip",
+    "sha256": "bfcc29f547c8fd97706efe143e24b014e3d0764df92c82d768c7cd7b7211baec",
+    "keyId": "gravewright-2026-10",
+    "signature": "cGpXfiE5Jy0VUmuY2XJXQxEJzGmmnnEuB9SwBFRRJLPMIFDJo5TLN6VI/HIKHS/ihnwvRZNRBskcWgBTyILZBw=="
   }
 ]
