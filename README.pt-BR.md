@@ -54,10 +54,18 @@ VTT. Veja no repositório de origem as licenças e as automações disponíveis.
 ## Savage Worlds Compatibility Package for Gravewright
 
 [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright)
-0.1.1 oferece fichas SWADE editáveis, estruturas vazias de itens, iniciativa com
+0.1.2 oferece fichas SWADE editáveis, estruturas vazias de itens, iniciativa com
 cartas nativas e automações pertencentes ao pacote. Não inclui conteúdo de jogo
 ou compêndios. Funciona na versão publicada **Gravewright VTT 0.2.3**, com as APIs
 públicas existentes, sem exigir uma nova release do VTT.
+
+A versão 0.1.2 compacta as fichas, as janelas de rolagem e os treze editores de
+itens, com texto de interface de pelo menos 12 px. As perícias e outras listas
+de nomes aparecem em ordem alfabética no idioma de interface escolhido, sem
+reordenar as coleções salvas. Cada perícia oferece um seletor de atributo
+vinculado, mantendo seu próprio dado e modificador. Os ajustes de layout do
+diretório nativo de itens e do navegador de compêndios pertencem ao VTT,
+separadamente deste ZIP de sistema.
 
 Instale o único pacote `gravewright.savage-worlds` (`type: "system"`) em
 **Sistemas** e selecione-o na mesa. Fichas, imagens e regras Savage Worlds ficam
