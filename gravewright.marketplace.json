@@ -176,5 +176,23 @@
     "sha256": "d1cc119fd1dfab9222d9740be0d175318ea352fcd681957b5b2ae90575794e6a",
     "keyId": "gravewright-2026-10",
     "signature": "vVCpaDdD2zK5hc+n4QrYL7eeJdYsMvmRAm/MmY4RsNshCo2rD99HJrn2uUN0exa/nLcSGDTXeHhjQnl5E7dGAA=="
+  },
+  {
+    "id": "gravewright.savage-worlds",
+    "name": "Savage Worlds Compatibility Package for Gravewright",
+    "version": "0.1.2",
+    "description": "One complete SWADE system package for Gravewright VTT 0.2.3+: editable sheets, item templates, action decks and package-owned automation through GM turn controls. Install under Systems. No game content or compendiums. English by default; official Translator for Portuguese and Spanish.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "system",
+    "tags": [
+      "Savage Worlds",
+      "SWADE",
+      "Fichas",
+      "Automa\u00e7\u00e3o"
+    ],
+    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.savage-worlds-v0.1.2/gravewright-savage-worlds-0.1.2.zip",
+    "sha256": "5ea29c7ea8fbde2924e0d57f9c057cde6c7f5cc77846c96473c757c7147cf1d4",
+    "keyId": "gravewright-2026-10",
+    "signature": "+NO6tQFFo3knryl0A+Pqnm5D3+eEiPDdw21Q7qTwyrnm8m43jJdSBBYrWGNXOGLmGz0oiLq0g2NwjUQ40JrfCg=="
   }
 ]
