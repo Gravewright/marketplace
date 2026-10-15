@@ -26,12 +26,19 @@ Esta versão exige um host com suporte a `manifest.locales` e à ativação glob
 
 ## DnD 5e SRD
 
-[DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) **0.1.1** reúne os perfis
+[DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) **0.1.2** reúne os perfis
 2014 (SRD 5.1) e 2024 (SRD 5.2.1) em um único pacote de sistema para o
 **Gravewright VTT 0.2.3 já publicado**. Instale em **Sistemas** e selecione essa
 versão para a mesa. Fichas, modelos de itens, compêndios SRD licenciados,
 iniciativa e automações de efeitos pertencem ao pacote. O mestre avança o combate
 pelo tracker do sistema. O core e a release do VTT permanecem inalterados.
+
+A versão 0.1.2 compacta as fichas de personagem e monstro, as janelas de rolagem
+e os onze editores de itens, com texto de interface de pelo menos 12 px. As
+perícias aparecem em ordem alfabética no idioma de interface escolhido. Cada
+perícia mantém o atributo selecionado; a janela de rolagem também permite uma
+troca temporária. Os ajustes de layout do diretório nativo de itens e do navegador
+de compêndios pertencem ao VTT, separadamente deste ZIP de sistema.
 
 O pacote atual usa somente `gravewright.5e-srd` (`type: "system"`), sem extensão
 de servidor nem ativação de Python. Instalações anteriores podem revisar o

@@ -23,19 +23,26 @@ GRAVEWRIGHT_MARKETPLACE_KEYS_FILE=/absolute/path/to/marketplace/trusted-keys.jso
 | --- | --- | --- |
 | [Translator](https://github.com/Gravewright/translator) | [v0.1.2](https://github.com/Gravewright/marketplace/releases/tag/gravewright.translator-v0.1.2) | Owner: Installed modules → Activate languages. Users: internal Settings → Interface language. |
 | [Gravewright 3D Dice](https://github.com/Gravewright/Gravewright-3D-Dice) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright-3d-dice-v0.1.1) | Activate per table in Extensions; appearance preferences are personal. |
-| [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-v0.1.1) | One package under Systems, including compendiums and automation. Works on VTT 0.2.3. |
+| [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) | [v0.1.2](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-v0.1.2) | One package under Systems, including compendiums and automation. Works on VTT 0.2.3. |
 | [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright.savage-worlds-v0.1.1) | One package under Systems, including its automation. Works on VTT 0.2.3. |
 
 Translator offers English, Brazilian Portuguese and Spanish. It requires a host with `manifest.locales` support and global language activation. Version 0.1.2 includes reviewed interface catalogs and module integration documentation. See the package README for coverage limits and validation instructions.
 
 ## DnD 5e SRD
 
-[DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) **0.1.1** includes the
+[DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) **0.1.2** includes the
 2014 (SRD 5.1) and 2024 (SRD 5.2.1) profiles in one system package for the
 published **Gravewright VTT 0.2.3**. Install it under **Systems** and select the
 version for your table. Sheets, item templates, licensed SRD compendiums,
 initiative and effect automation belong to this package. The GM advances combat
 through the system tracker. The VTT core and its release remain unchanged.
+
+Version 0.1.2 compacts character and monster sheets, roll windows and all eleven
+item editors, with interface text of at least 12 px. Skills appear in alphabetical
+order in the selected interface language. Each skill remembers its selected
+ability; the roll window also offers a temporary override. Native item-directory
+and compendium-browser layout updates belong to the VTT, separately from this
+system ZIP.
 
 The only current package ID is `gravewright.5e-srd` (`type: "system"`). No server
 extension or Python activation is required. Earlier installations can review
