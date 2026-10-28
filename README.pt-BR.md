@@ -53,8 +53,10 @@ VTT. Veja no repositório de origem as licenças e as automações disponíveis.
 
 ## Savage Worlds Compatibility Package for Gravewright
 
+A versão **0.1.4** compacta ainda mais as fichas e usa os tipos **Carta Selvagem** e **Extra**. O mestre escolhe o tipo na criação; o setup da ficha não oferece mais esse seletor. Os identificadores e dados existentes são preservados.
+
 [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright)
-0.1.2 oferece fichas SWADE editáveis, estruturas vazias de itens, iniciativa com
+0.1.4 oferece fichas SWADE editáveis, estruturas vazias de itens, iniciativa com
 cartas nativas e automações pertencentes ao pacote. Não inclui conteúdo de jogo
 ou compêndios. Funciona na versão publicada **Gravewright VTT 0.2.3**, com as APIs
 públicas existentes, sem exigir uma nova release do VTT.

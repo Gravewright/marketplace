@@ -24,7 +24,7 @@ GRAVEWRIGHT_MARKETPLACE_KEYS_FILE=/absolute/path/to/marketplace/trusted-keys.jso
 | [Translator](https://github.com/Gravewright/translator) | [v0.1.2](https://github.com/Gravewright/marketplace/releases/tag/gravewright.translator-v0.1.2) | Owner: Installed modules → Activate languages. Users: internal Settings → Interface language. |
 | [Gravewright 3D Dice](https://github.com/Gravewright/Gravewright-3D-Dice) | [v0.1.1](https://github.com/Gravewright/marketplace/releases/tag/gravewright-3d-dice-v0.1.1) | Activate per table in Extensions; appearance preferences are personal. |
 | [DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) | [v0.1.2](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-v0.1.2) | One package under Systems, including compendiums and automation. Works on VTT 0.2.3. |
-| [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright) | [v0.1.2](https://github.com/Gravewright/marketplace/releases/tag/gravewright.savage-worlds-v0.1.2) | One package under Systems, including its automation. Works on VTT 0.2.3. |
+| [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright) | [v0.1.4](https://github.com/Gravewright/marketplace/releases/tag/gravewright.savage-worlds-v0.1.4) | One package under Systems, including its automation. Works on VTT 0.2.3. |
 
 Translator offers English, Brazilian Portuguese and Spanish. It requires a host with `manifest.locales` support and global language activation. Version 0.1.2 includes reviewed interface catalogs and module integration documentation. See the package README for coverage limits and validation instructions.
 
@@ -57,8 +57,10 @@ VTT version. See the source repository for licensing and supported automation.
 
 ## Savage Worlds Compatibility Package for Gravewright
 
+Version **0.1.4** further compacts sheets and names actor types **Wild Card** and **Extra**. The GM chooses the type at creation; the sheet setup no longer offers a type selector. Existing actor identifiers and saved data are preserved.
+
 [Savage Worlds Compatibility Package for Gravewright](https://github.com/Gravewright/Savage-Worlds-Compatibility-Package-for-Gravewright)
-0.1.2 provides editable SWADE sheets, blank item structures, native action-card
+0.1.4 provides editable SWADE sheets, blank item structures, native action-card
 initiative and package-owned automation. It includes no game content or compendiums.
 It works on the published **Gravewright VTT 0.2.3**, using its existing public
 APIs. This system update does not require a new VTT release.
