@@ -26,30 +26,44 @@ Esta versão exige um host com suporte a `manifest.locales` e à ativação glob
 
 ## DnD 5e SRD
 
-[DnD 5e SRD](https://github.com/Gravewright/dnd-srd-5e) **0.1.2** reúne os perfis
-2014 (SRD 5.1) e 2024 (SRD 5.2.1) em um único pacote de sistema para o
-**Gravewright VTT 0.2.3 já publicado**. Instale em **Sistemas** e selecione essa
-versão para a mesa. Fichas, modelos de itens, compêndios SRD licenciados,
-iniciativa e automações de efeitos pertencem ao pacote. O mestre avança o combate
-pelo tracker do sistema. O core e a release do VTT permanecem inalterados.
+[DnD 5e SRD 0.2.2](https://github.com/Gravewright/marketplace/releases/tag/gravewright.5e-srd-v0.2.2)
+reúne os perfis **2014 / SRD 5.1** e **2024 / SRD 5.2.1** em um único sistema
+assinado para o navegador. Como proprietário do host, atualize o catálogo do
+Marketplace, abra **Sistemas** e instale ou atualize **DnD 5e SRD**. Em cada mesa
+existente, selecione **0.2.2** em **Configurações → Extensões** e recarregue as
+páginas abertas. Mantenha a versão anterior instalada se precisar selecioná-la
+novamente para reverter a atualização.
 
-A versão 0.1.2 compacta as fichas de personagem e monstro, as janelas de rolagem
-e os onze editores de itens, com texto de interface de pelo menos 12 px. As
-perícias aparecem em ordem alfabética no idioma de interface escolhido. Cada
-perícia mantém o atributo selecionado; a janela de rolagem também permite uma
-troca temporária. Os ajustes de layout do diretório nativo de itens e do navegador
-de compêndios pertencem ao VTT, separadamente deste ZIP de sistema.
+O pacote funciona no **Gravewright VTT 0.2.3 publicado**, com SDK 1.x.
+No **VTT 0.3.8**, usa lotes nativos de iniciativa e organiza os vinte e dois
+pacotes de compêndio na pasta **DnD 5e SRD**, com uma subpasta por edição. Hosts
+anteriores mantêm a recuperação sequencial da iniciativa e a lista plana de
+compêndios.
 
-O pacote atual usa somente `gravewright.5e-srd` (`type: "system"`), sem extensão
-de servidor nem ativação de Python. Instalações anteriores podem revisar o
-complemento antigo em **Personalizar** no próprio sistema; o proprietário do
-host autoriza a desativação e a remoção após conferir as mesas afetadas. Fichas,
-itens, opções da mesa e assinaturas de versões históricas são preservados.
+A versão 0.2.2 corrige automações suportadas conferidas com o SRD oficial,
+incluindo CA por Destreza, PV por Constituição, itens de proteção e o estilo
+de luta Defesa. As coleções licenciadas contêm **2.535 entradas de itens**,
+**317 monstros do SRD 5.1** e **330 monstros do SRD 5.2.1**. Jogadores podem copiar
+itens legíveis dos compêndios para fichas editáveis, respeitando as permissões
+de leitura do servidor. Importações para a biblioteca e Efeitos continuam
+exclusivos do mestre. As coleções são parciais; regras sem automação declarativa
+suportada continuam manuais.
 
-Inglês é o idioma padrão. Ative o Translator oficial 0.1.2 para a interface em
-português ou espanhol; os textos dos compêndios SRD permanecem em inglês.
-O catálogo descreve o requisito da aplicação, mas não impõe versão mínima do
-VTT. Veja no repositório de origem as licenças e as automações disponíveis.
+O identificador estável é `gravewright.5e-srd` (`type: "system"`). Fichas,
+modelos de itens, traduções, configurações, iniciativa e automações de turno
+suportadas pertencem a esse único pacote. O mestre avança o combate pelo tracker
+do sistema. Instalações novas dispensam extensão de servidor e ativação de
+Python. Instalações anteriores podem revisar um complemento antigo em
+**Personalizar**; o proprietário do host autoriza a desativação e a remoção após
+conferir as mesas afetadas. Fichas, itens e configurações das mesas são preservados.
+
+Inglês é o idioma padrão da interface. Ative o Translator oficial **0.1.2 ou
+mais recente** para português ou espanhol; os textos dos compêndios SRD
+permanecem em inglês. O catálogo descreve o requisito da aplicação, mas não
+impõe versão mínima do VTT. A
+[release de origem](https://github.com/Gravewright/dnd-srd-5e/releases/tag/v0.2.2)
+oferece o mesmo ZIP para instalação local. Veja no repositório de origem as
+licenças, automações suportadas e instruções de instalação.
 
 ## Savage Worlds Compatibility Package for Gravewright
 
