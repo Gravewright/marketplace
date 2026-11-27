@@ -263,5 +263,24 @@
     "sha256": "63ca29efcb95453979bcf8eb04b16616dcd10fb611b919f4b2c7f9db881e063c",
     "keyId": "gravewright-2026-10",
     "signature": "Klpo86YnQgfjoFeLzK1cUY3/tpJ6nQxBXbq5T15ymcy+ULPL3fVXMUQ9JgeR8jgepY54IGFRVpwMZbCxWqrWBg=="
+  },
+  {
+    "id": "gravewright.5e-srd",
+    "name": "DnD 5e SRD",
+    "version": "0.2.2",
+    "description": "DnD 5e SRD for Gravewright VTT 0.2.3: one browser system with character, monster and item sheets, licensed SRD compendiums, selectable 2014/2024 rules and package-owned automation.",
+    "sdk": ">=1.0.0 <2.0.0",
+    "type": "system",
+    "tags": [
+      "D&D",
+      "5e",
+      "SRD",
+      "2014",
+      "2024"
+    ],
+    "download": "https://github.com/Gravewright/marketplace/releases/download/gravewright.5e-srd-v0.2.2/gravewright-5e-srd-0.2.2.zip",
+    "sha256": "fca368f034bf758fe8dbfe85390029ada7c52867675f747fbb57ee5f2d1f036c",
+    "keyId": "gravewright-2026-10",
+    "signature": "lboK0AgVgePoX4lrtxmzgI2y7qv5tP4y58dkPLHznw1spOsZqbcspOqMcvlTpKIslDj2VsAxk5S90CGtiszVAg=="
   }
 ]
